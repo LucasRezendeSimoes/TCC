@@ -2,8 +2,9 @@ import pandas as pd
 import random
 import hashlib
 from datetime import datetime, timedelta
+import os
 
-def gerar_movimentacao_hashes(num_hashes=5, num_cameras=3, salvar_csv=True, caminho_csv="movimentacao_pessoas_cameras.csv"):
+def gerar_movimentacao_hashes(num_hashes=5, num_cameras=3, salvar_csv=True, caminho_csv="Dados/movimentacao_pessoas_cameras.csv"):
     """
     Gera movimentações de hashes entre múltiplas câmeras com timestamps coerentes.
 
@@ -16,6 +17,12 @@ def gerar_movimentacao_hashes(num_hashes=5, num_cameras=3, salvar_csv=True, cami
     Retorna:
         pd.DataFrame: DataFrame com os dados simulados.
     """
+
+    # Garante que a pasta "Dados" exista
+    os.makedirs("Dados", exist_ok=True)
+
+    # Define o caminho do arquivo
+    filepath = os.path.join("Dados", "dados_gerados.csv")
     
     def gerar_hash(index):
         return hashlib.md5(f"pessoa_{index}".encode()).hexdigest()[:8]
@@ -61,4 +68,4 @@ def gerar_movimentacao_hashes(num_hashes=5, num_cameras=3, salvar_csv=True, cami
 
 
 # Exemplo de uso:
-df = gerar_movimentacao_hashes(num_hashes=20, num_cameras=4)
+df = gerar_movimentacao_hashes(num_hashes=180, num_cameras=47)
