@@ -3,11 +3,17 @@ import duckdb
 # Conectar
 con = duckdb.connect()
 # Ler CSV como tabela
-con.execute("CREATE TABLE dados AS SELECT * FROM read_csv_auto('Dados/movimentacao_pessoas_cameras.csv')")
+tabela = 'Dados/movimentacao_pessoas_cameras.csv'
+con.execute(f'CREATE TABLE dados AS SELECT * FROM read_csv_auto({tabela})')
 #----------------------------------------------------------
 # Queries Inputs:
 sql = input("Query SQL: ")
-con.execute(sql).fetchdf())
+try:
+    # Tenta executar a consulta
+    print(con.execute(sql).fetchdf())
+except Exception as e:
+    # erro
+    print(f"Erro na consulta: {e}")
 
 #----------------------------------------------------------
 # Exemplos de queries:
