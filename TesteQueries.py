@@ -5,43 +5,53 @@ con = duckdb.connect()
 # Ler CSV como tabela
 con.execute("CREATE TABLE dados AS SELECT * FROM read_csv_auto('Dados/movimentacao_pessoas_cameras.csv')")
 #----------------------------------------------------------
+# Queries Inputs:
+sql = input("Query SQL: ")
+con.execute(sql).fetchdf())
 
-arq = "Dados/movimentacao_pessoas_cameras.csv"
-
+#----------------------------------------------------------
 # Exemplos de queries:
-
 # 1) Buscar tudo de uma pessoa
-print(con.execute("SELECT * FROM dados WHERE hash = '818257ed'").fetchdf()) # Precisa colocar entre aspas simples
+print(con.execute("""
+SELECT * FROM dados
+WHERE hash = '818257ed'
+""").fetchdf()) # Precisa colocar entre aspas simples
 
 # 2) Buscar por câmera
-print(con.execute(f'SELECT * FROM dados WHERE numero_camera = 2').fetchdf())
+print(con.execute("""
+SELECT * FROM dados
+WHERE numero_camera = 2
+""").fetchdf())
 
 # 3) Pessoa em certo intervalo
 print(con.execute("""
-    SELECT * FROM dados
-    WHERE hash = '818257ed'
-      AND horario_primeira_aparicao >= '2025-08-20 14:09:00'
-      AND horario_ultima_aparicao <= '2025-08-20 14:11:00'
+SELECT * FROM dados
+WHERE hash = '818257ed'
+AND horario_primeira_aparicao >= '2025-08-20 14:09:00'
+AND horario_ultima_aparicao <= '2025-08-20 14:11:00'
 """).fetchdf())
 
 
-# Buscar todas as aparições de uma pessoa em um único dia
-print(con.execute(f"SELECT * FROM dados WHERE hash = '818257ed' AND DATE(horario_primeira_aparicao) = '2025-08-20'").fetchdf())
+# 4) Buscar todas as aparições de uma pessoa em um único dia
+print(con.execute("""SELECT * FROM dados
+WHERE hash = '818257ed'
+AND DATE(horario_primeira_aparicao) = '2025-08-20'
+""").fetchdf())
 
-# Buscar todas as aparições de qualquer pessoa entre duas datas
+# 5) Buscar todas as aparições de qualquer pessoa entre duas datas
 print(con.execute("""
 SELECT * FROM dados
 WHERE horario_primeira_aparicao BETWEEN '2025-08-19' AND '2025-08-21'
 """).fetchdf())
 
-# Buscar todas as aparições de uma câmera específica em certo dia
+# 6) Buscar todas as aparições de uma câmera específica em certo dia
 print(con.execute("""
 SELECT * FROM dados
 WHERE numero_camera = 2
-  AND DATE(horario_primeira_aparicao) = '2025-08-20'
+AND DATE(horario_primeira_aparicao) = '2025-08-20'
 """).fetchdf())
 
-# Buscar todas as pessoas que passaram por uma sequência de câmeras
+# 7) Buscar todas as pessoas que passaram por uma sequência de câmeras
 print(con.execute("""
 SELECT hash, COUNT(DISTINCT numero_camera) AS cameras_vistas
 FROM dados
@@ -50,16 +60,15 @@ GROUP BY hash
 HAVING COUNT(DISTINCT numero_camera) = 4
 """).fetchdf())
 
-# Buscar o tempo de permanência de cada aparição
+# 8) Buscar o tempo de permanência de cada aparição
 print(con.execute("""
-SELECT *,
-       horario_ultima_aparicao - horario_primeira_aparicao AS tempo_total
+SELECT *, horario_ultima_aparicao - horario_primeira_aparicao AS tempo_total
 FROM dados
 WHERE hash = '818257ed'
 """).fetchdf())
 
 
-# Buscar a última aparição de uma pessoa
+# 9) Buscar a última aparição de uma pessoa
 print(con.execute("""
 SELECT *,SELECT *
 FROM dados
@@ -69,7 +78,7 @@ LIMIT 1
 """).fetchdf())
 
 
-# Ver todos os horários em que uma pessoa foi vista em cada câmera
+# 10) Ver todos os horários em que uma pessoa foi vista em cada câmera
 print(con.execute("""
 SELECT numero_camera,
        MIN(horario_primeira_aparicao) AS primeira_vez,
@@ -81,7 +90,7 @@ ORDER BY numero_camera
 """).fetchdf())
 
 
-# Ver quantas vezes cada pessoa apareceu (quantidade total de registros)
+# 11) Ver quantas vezes cada pessoa apareceu (quantidade total de registros)
 print(con.execute("""
 SELECT numero_camera,
        MIN(horario_primeira_aparicao) AS primeira_vez,
