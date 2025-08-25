@@ -3,8 +3,8 @@ import duckdb
 # Conectar
 con = duckdb.connect()
 # Ler CSV como tabela
-tabela = 'Dados/movimentacao_pessoas_cameras.csv'
-con.execute(f'CREATE TABLE dados AS SELECT * FROM read_csv_auto({tabela})')
+tabela = "Dados/movimentacao_pessoas_cameras.csv"
+con.execute(f'CREATE TABLE dados AS SELECT * FROM read_csv_auto("Dados/movimentacao_pessoas_cameras.csv")')
 #----------------------------------------------------------
 # Queries Inputs:
 sql = input("Query SQL: ")
@@ -17,6 +17,7 @@ except Exception as e:
 
 #----------------------------------------------------------
 # Exemplos de queries:
+'''
 # 1) Buscar tudo de uma pessoa
 print(con.execute("""
 SELECT * FROM dados
@@ -106,6 +107,4 @@ WHERE hash = '818257ed'
 GROUP BY numero_camera
 ORDER BY numero_camera
 """).fetchdf())
-
-
-# Ver todas as pessoas que passaram por uma câmera específica em certo período
+'''

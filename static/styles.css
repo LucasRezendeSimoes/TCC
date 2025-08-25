@@ -1,0 +1,92 @@
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 250px;
+    background-color: #343a40;
+    color: white;
+    padding: 15px;
+    transition: width 0.3s ease;
+    overflow-x: hidden;
+  }
+
+  .sidebar h3 {
+    margin-top: 0;
+  }
+
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .sidebar ul li {
+    padding: 8px;
+    border-bottom: 1px solid #495057;
+    cursor: pointer;
+  }
+
+  .sidebar button {
+    background-color: #495057;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .sidebar.collapsed {
+    width: 50px;
+  }
+
+  .sidebar.collapsed h3,
+  .sidebar.collapsed ul {
+    display: none;
+  }
+
+  /* Coluna direita (conteúdo + painel inferior) */
+  .right-side {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+
+  /* Conteúdo principal */
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow: auto;
+  }
+
+  /* Resizer */
+  .resizer {
+    height: 5px;
+    background: #ccc;
+    cursor: row-resize;
+  }
+
+  /* Painel inferior (tipo terminal do VS Code) */
+  .bottom-panel {
+    padding-left: 30px;
+    height: 200px;
+    background: #f1f1f1;
+    overflow: auto;
+  }
+
+.arquivo-item.ativo {
+  background-color: white;
+  color: #495057;
+  font-weight: bold;
+}
+
+.grafo-container {
+  display: flex;
+  justify-content: center;
+}
