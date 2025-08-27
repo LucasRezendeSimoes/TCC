@@ -101,7 +101,7 @@ document.getElementById("form-consulta").addEventListener("submit", async functi
   }
 });
 
-// --------------------- Carregar lista de arquivos
+// --------------------- Carregar lista de arquivos e conteúdo ao clicar
 async function carregarArquivos() {
   try {
     const res = await fetch("/arquivos");
@@ -116,12 +116,29 @@ async function carregarArquivos() {
         li.textContent = nome;
         li.classList.add("arquivo-item");
 
-        li.addEventListener("click", () => {
+        li.addEventListener("click", async () => {
           arquivoSelecionado = nome;
 
           // Remover destaque de todos
           document.querySelectorAll(".arquivo-item").forEach(el => el.classList.remove("ativo"));
           li.classList.add("ativo");
+
+          // Carregar conteúdo da base
+          const formData = new FormData();
+          formData.append("arquivo", nome);
+
+          try {
+            const res = await fetch("/carregar_base", {
+              method: "POST",
+              body: formData
+            });
+
+            const text = await res.text();
+            const data = JSON.parse(text);
+            bottomPanel.innerHTML = `<pre>${data.result}</pre>`;
+          } catch (err) {
+            bottomPanel.innerHTML = `<pre>Erro ao carregar base: ${err}</pre>`;
+          }
         });
 
         lista.appendChild(li);
@@ -139,5 +156,5 @@ async function carregarArquivos() {
   }
 }
 
-// Chamar ao carregar a página
+// Carrega os arquivos ao iniciar
 carregarArquivos();

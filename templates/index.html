@@ -12,11 +12,7 @@
   <div id="sidebar" class="sidebar">
     <button id="toggleSidebar">☰</button>
     <h3>Bases de dados</h3>
-    <ul id="item-list">
-      <li>DB 1</li>
-      <li>DB 2</li>
-      <li>DB 3</li>
-    </ul>
+    <ul id="item-list"></ul>
   </div>
 
   <!-- Área direita (coluna) -->
@@ -24,13 +20,11 @@
 
     <!-- Conteúdo principal -->
     <div class="main-content" id="mainContent">
-      <h2>Mapa</h2>
       <iframe src="{{ url_for('mapa') }}" width="100%" height="400px" frameborder="0"></iframe>
-
 
       <h2>Query SQL</h2>
       <form id="sqlForm">
-        <textarea name="sql" rows="4">SELECT * FROM dados WHERE numero_camera = 2</textarea>
+        <textarea name="sql" rows="4" placeholder="SELECT * FROM dados WHERE numero_camera = 2"></textarea>
         <button type="submit">Executar</button>
       </form>
 

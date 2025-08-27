@@ -6,8 +6,6 @@ app = Flask(__name__)
 
 # Conectar DuckDB
 con = duckdb.connect()
-
-
 # Conectar DuckDB e carregar CSV em tabela
 def carregar_tabela(nome_arquivo):
     caminho = os.path.join("Dados", nome_arquivo)
@@ -16,6 +14,19 @@ def carregar_tabela(nome_arquivo):
         SELECT * FROM read_csv_auto('{caminho}')
     """)
 
+
+@app.route("/carregar_base", methods=["POST"])
+def carregar_base():
+    arquivo = request.form.get("arquivo")
+    try:
+        carregar_tabela(arquivo)
+        df = con.execute("SELECT * FROM dados").fetchdf()
+        linhas = len(df)
+        result_str = f"{linhas} resultado(s) encontrado(s)\n\n" + df.to_string(index=False)
+        return jsonify({"result": result_str})
+
+    except Exception as e:
+        return jsonify({"result": f"Erro ao carregar base: {e}"})
 
 @app.route("/")
 def index():
@@ -32,12 +43,11 @@ def query():
     try:
         carregar_tabela(arquivo)
         df = con.execute(sql).fetchdf()
-        result_str = df.to_string(index=False)
+        linhas = len(df)
+        result_str = f"{linhas} resultado(s) encontrado(s)\n\n" + df.to_string(index=False)
         return jsonify({"result": result_str})
     except Exception as e:
         return jsonify({"result": f"Erro na consulta: {e}"})
-
-
 
 @app.route("/auto_query", methods=["POST"])
 def auto_query():
@@ -85,55 +95,14 @@ def auto_query():
 
     try:
         df = con.execute(sql).fetchdf()
-        result_str = df.to_string(index=False)
+        linhas = len(df)
+        result_str = f"{linhas} resultado(s) encontrado(s)\n\n" + df.to_string(index=False)
         return jsonify({"result": result_str})
+
+
     except Exception as e:
         return jsonify({"result": f"Erro na consulta: {e}"})
 
-    hash_val = request.form.get("hash")
-    inicio = request.form.get("inicio")
-    fim = request.form.get("fim")
-    numero_camera = request.form.get("numero_camera")
-
-    # Corrigir o formato da data para 'YYYY-MM-DD HH:MM:00'
-    def format_datetime(dt_str):
-        if dt_str and "T" in dt_str:
-            return dt_str.replace("T", " ") + ":00"
-        return dt_str
-
-    inicio = format_datetime(inicio)
-    fim = format_datetime(fim)
-
-    where_clauses = []
-
-    if hash_val:
-        where_clauses.append(f"hash = '{hash_val}'")
-
-    if numero_camera:
-        where_clauses.append(f"numero_camera = {numero_camera}")
-
-    # Usar a coluna de horário correta
-    coluna_data = "horario_primeira_aparicao"
-
-    if inicio and fim:
-        where_clauses.append(f"{coluna_data} BETWEEN '{inicio}' AND '{fim}'")
-    elif inicio:
-        where_clauses.append(f"{coluna_data} = '{inicio}'")
-    elif fim:
-        where_clauses.append(f"{coluna_data} = '{fim}'")
-
-    sql = "SELECT * FROM dados"
-    if where_clauses:
-        sql += " WHERE " + " AND ".join(where_clauses)
-
-    print("Consulta montada:", sql)
-
-    try:
-        df = con.execute(sql).fetchdf()
-        result_str = df.to_string(index=False)
-        return jsonify({"result": result_str})
-    except Exception as e:
-        return jsonify({"result": f"Erro na consulta: {e}"})
 
 # Envia arquivos da pasta Dados
 @app.route("/arquivos")
