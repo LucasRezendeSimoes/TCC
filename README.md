@@ -67,6 +67,8 @@
 - Referência de DB selecionada
 - Construção do mapa
 - Contagem de linhas do resultado da pesquisa
+- + Query automatizadas (Linha e Estação referenciadas por informações da câmera cams.csv)
+- 
 
 # Dependencias
 * 'python -m pip install duckdb flask pandas pyvis'
