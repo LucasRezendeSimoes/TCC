@@ -5,9 +5,9 @@ def gerar_grafo():
     net = Network(height="380px", width="50%", directed=False, bgcolor="#495057", font_color="white")
 
     # Vértices
-    net.add_node(1, label="Câmera 1", x=0, y=0, fixed=True, color="white", size=10)
-    net.add_node(2, label="Câmera 2", x=200, y=100, fixed=True, color="white", size=10)
-    net.add_node(3, label="Câmera 3", x=400, y=0, fixed=True, color="white", size=10)
+    net.add_node(1, label="Câmera 1", x=0, y=0, fixed=True, color="white", size=5)
+    net.add_node(2, label="Câmera 2", x=200, y=100, fixed=True, color="white", size=5)
+    net.add_node(3, label="Câmera 3", x=400, y=0, fixed=True, color="white", size=5)
 
     # Arestas
     net.add_edge(1, 2)

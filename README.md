@@ -52,10 +52,10 @@
 # Implementações:
 ## Implementações para fazer:
 - Exportar log
-- Contagem de linhas do resultado da pesquisa
 - Diferenciação de log inválido e válido mas com 0 resultados
 - Importar e exportar Mapas
 - Importar e exportar DB
+- Atualizar .scv de banco de dados remoto
 
 ## Implementações feitas:
 - Função que gera dados para testes
@@ -65,6 +65,7 @@
 - Listagem de arquivos em "Dados"
 - Referência de DB selecionada
 - Construção do mapa
+- Contagem de linhas do resultado da pesquisa
 
 # Dependencias
 * 'python -m pip install duckdb flask pandas pyvis'

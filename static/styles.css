@@ -29,6 +29,7 @@
     padding: 8px;
     border-bottom: 1px solid #495057;
     cursor: pointer;
+    overflow: hidden;
   }
 
   .sidebar button {
@@ -37,8 +38,15 @@
     color: white;
     padding: 8px 12px;
     cursor: pointer;
+    border-radius: 5px;
     width: 100%;
     margin-bottom: 15px;
+  }
+
+  .sidebar input, select, textarea{
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
   }
 
   .sidebar.collapsed {
@@ -51,42 +59,54 @@
   }
 
   /* Coluna direita (conteúdo + painel inferior) */
-  .right-side {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    overflow: hidden;
-  }
+.right-side {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;  /* ocupa toda a altura da janela */
+  width: 100%;
+}
 
   /* Conteúdo principal */
-  .main-content {
-    flex-grow: 1;
-    padding: 20px;
-    overflow: auto;
-  }
+.main-content {
+  flex: 1;              /* ocupa todo o espaço disponível acima do terminal */
+  overflow: auto;       /* rolagem caso o conteúdo passe da tela */
+  padding: 10px;
+  background: #fff;
+}
 
   /* Resizer */
-  .resizer {
-    height: 5px;
-    background: #ccc;
-    cursor: row-resize;
-  }
+.resizer {
+  height: 6px;
+  cursor: row-resize;
+  background: #666;
+}
 
   /* Painel inferior (tipo terminal do VS Code) */
-  .bottom-panel {
-    padding-left: 30px;
-    height: 200px;
-    background: #f1f1f1;
-    overflow: auto;
-  }
+.bottom-panel {
+  height: 200px;        /* altura inicial */
+  min-height: 50px;
+  max-height: 80vh;
+  overflow: auto;
+  background: #111;
+  color: white;
+  font-family: monospace;
+  border-top: 2px solid #444;
+  padding: 10px;
+}
+
 
 .arquivo-item.ativo {
   background-color: white;
   color: #495057;
   font-weight: bold;
+  border-radius: 5px;
 }
 
 .grafo-container {
   display: flex;
   justify-content: center;
+}
+
+#sqlTextBox{
+    resize: vertical;
 }

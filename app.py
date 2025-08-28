@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, jsonify
 import duckdb
 import os
+import pandas as pd
 
 app = Flask(__name__)
 
 # Conectar DuckDB
 con = duckdb.connect()
-# Conectar DuckDB e carregar CSV em tabela
+
+# Carregar CSV em DuckDB
 def carregar_tabela(nome_arquivo):
     caminho = os.path.join("Dados", nome_arquivo)
     con.execute(f"""
@@ -14,7 +16,7 @@ def carregar_tabela(nome_arquivo):
         SELECT * FROM read_csv_auto('{caminho}')
     """)
 
-
+#---------------------------------------------------------------------
 @app.route("/carregar_base", methods=["POST"])
 def carregar_base():
     arquivo = request.form.get("arquivo")
@@ -24,14 +26,15 @@ def carregar_base():
         linhas = len(df)
         result_str = f"{linhas} resultado(s) encontrado(s)\n\n" + df.to_string(index=False)
         return jsonify({"result": result_str})
-
     except Exception as e:
         return jsonify({"result": f"Erro ao carregar base: {e}"})
 
+#---------------------------------------------------------------------
 @app.route("/")
 def index():
     return render_template("index.html")
 
+#---------------------------------------------------------------------
 @app.route("/query", methods=["POST"])
 def query():
     sql = request.form.get("sql")
@@ -49,18 +52,18 @@ def query():
     except Exception as e:
         return jsonify({"result": f"Erro na consulta: {e}"})
 
+#---------------------------------------------------------------------
 @app.route("/auto_query", methods=["POST"])
 def auto_query():
+    from pathlib import Path
+
     hash_val = request.form.get("hash")
     inicio = request.form.get("inicio")
     fim = request.form.get("fim")
     numero_camera = request.form.get("numero_camera")
+    linha = request.form.get("linha")
+    estacao = request.form.get("estacao")
     arquivo = request.form.get("arquivo")
-
-    try:
-        carregar_tabela(arquivo)
-    except Exception as e:
-        return jsonify({"result": f"Erro ao carregar arquivo: {e}"})
 
     def format_datetime(dt_str):
         if dt_str and "T" in dt_str:
@@ -70,6 +73,11 @@ def auto_query():
     inicio = format_datetime(inicio)
     fim = format_datetime(fim)
 
+    try:
+        carregar_tabela(arquivo)
+    except Exception as e:
+        return jsonify({"result": f"Erro ao carregar arquivo de movimentação: {e}"})
+
     where_clauses = []
 
     if hash_val:
@@ -78,8 +86,29 @@ def auto_query():
     if numero_camera:
         where_clauses.append(f"numero_camera = {numero_camera}")
 
-    coluna_data = "horario_primeira_aparicao"
+    cameras_filtradas = None
+    if linha or estacao:
+        try:
+            cams_path = Path("Dados") / "cams.csv"
+            cams_df = pd.read_csv(cams_path)
 
+            filtro = pd.Series([True] * len(cams_df))
+            if linha:
+                filtro &= cams_df["Linha"].str.lower() == linha.lower()
+            if estacao:
+                filtro &= cams_df["Estação"].str.lower() == estacao.lower()
+
+            cameras_filtradas = cams_df.loc[filtro, "Número da camera"].tolist()
+
+            if not cameras_filtradas:
+                return jsonify({"result": f"Nenhuma câmera encontrada para linha='{linha}' e estação='{estacao}'."})
+
+            where_clauses.append(f"numero_camera IN ({','.join(map(str, cameras_filtradas))})")
+
+        except Exception as e:
+            return jsonify({"result": f"Erro ao consultar cams.csv: {e}"})
+
+    coluna_data = "horario_primeira_aparicao"
     if inicio and fim:
         where_clauses.append(f"{coluna_data} BETWEEN '{inicio}' AND '{fim}'")
     elif inicio:
@@ -98,13 +127,10 @@ def auto_query():
         linhas = len(df)
         result_str = f"{linhas} resultado(s) encontrado(s)\n\n" + df.to_string(index=False)
         return jsonify({"result": result_str})
-
-
     except Exception as e:
         return jsonify({"result": f"Erro na consulta: {e}"})
 
-
-# Envia arquivos da pasta Dados
+#---------------------------------------------------------------------
 @app.route("/arquivos")
 def arquivos():
     pasta = "Dados"
@@ -114,17 +140,14 @@ def arquivos():
         return jsonify({"arquivos": arquivos})
     except Exception as e:
         return jsonify({"erro": str(e)})
-    
 
-# gera mapa
+#---------------------------------------------------------------------
 @app.route("/mapa")
 def mapa():
-    from mapa import gerar_grafo  # ou grafo.py, depende do seu nome
+    from mapa import gerar_grafo
     gerar_grafo()
     return app.send_static_file("mapas/mapa.html")
 
-
-
-#-------------------------------------------------------
+#---------------------------------------------------------------------
 if __name__ == "__main__":
     app.run(debug=True)

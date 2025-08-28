@@ -12,26 +12,27 @@ const bottomPanel = document.getElementById("bottomPanel");
 
 let isResizing = false;
 
-resizer.addEventListener("mousedown", function () {
+resizer.addEventListener("mousedown", () => {
   isResizing = true;
   document.body.style.cursor = "row-resize";
 });
 
-window.addEventListener("mousemove", function (e) {
+window.addEventListener("mousemove", (e) => {
   if (!isResizing) return;
+  const containerRect = document.querySelector(".right-side").getBoundingClientRect();
+  const newHeight = containerRect.bottom - e.clientY;
 
-  const windowHeight = window.innerHeight;
-  const newBottomHeight = windowHeight - e.clientY;
-
-  if (newBottomHeight > 50 && newBottomHeight < windowHeight - 100) {
-    bottomPanel.style.height = newBottomHeight + "px";
+  if (newHeight > 50 && newHeight < window.innerHeight - 100) {
+    bottomPanel.style.height = newHeight + "px";
   }
 });
 
-window.addEventListener("mouseup", function () {
+window.addEventListener("mouseup", () => {
   isResizing = false;
   document.body.style.cursor = "default";
 });
+
+
 
 // --------------------- FORM 1: SQL manual
 document.getElementById("sqlForm").addEventListener("submit", async function(e) {
@@ -61,6 +62,8 @@ document.getElementById("sqlForm").addEventListener("submit", async function(e) 
   }
 });
 
+
+
 // --------------------- FORM 2: Query automática
 document.getElementById("form-consulta").addEventListener("submit", async function (e) {
   e.preventDefault();
@@ -69,6 +72,8 @@ document.getElementById("form-consulta").addEventListener("submit", async functi
   const inicio = document.getElementById("inicio").value;
   const fim = document.getElementById("fim").value;
   const camera = document.getElementById("camera").value;
+  const linha = document.getElementById("linha").value;
+  const estacao = document.getElementById("estacao").value;
 
   const params = new URLSearchParams();
   if (hash) params.append("hash", hash);
@@ -76,6 +81,8 @@ document.getElementById("form-consulta").addEventListener("submit", async functi
   if (fim) params.append("fim", fim);
   if (camera) params.append("numero_camera", camera);
   if (arquivoSelecionado) params.append("arquivo", arquivoSelecionado);
+  if (linha) params.append("linha", linha);
+  if (estacao) params.append("estacao", estacao);
 
   try {
     const res = await fetch("/auto_query", {
@@ -100,6 +107,8 @@ document.getElementById("form-consulta").addEventListener("submit", async functi
     bottomPanel.innerHTML = `<pre>Erro de conexão: ${err}</pre>`;
   }
 });
+
+
 
 // --------------------- Carregar lista de arquivos e conteúdo ao clicar
 async function carregarArquivos() {
