@@ -3,6 +3,7 @@
 # Desenvolvedores:
 - Fernando Milani Venerando (RA: 24.122.063-1)
 - Lucas Rezende Simões (RA: 24.122.028-4)
+
 '8° semestre Ciências da Computação FEI - 2025'
 
 # Brainstorm:
