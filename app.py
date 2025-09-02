@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import duckdb
 import os
 import pandas as pd
-
+from werkzeug.utils import secure_filename
+#---------------------------------------------------------------------
 app = Flask(__name__)
 
 # Conectar DuckDB
@@ -147,6 +148,28 @@ def mapa():
     from mapa import gerar_grafo
     gerar_grafo()
     return app.send_static_file("mapas/mapa.html")
+
+#---------------------------------------------------------------------
+@app.route("/upload_csv", methods=["POST"])
+def upload_csv():
+    if "arquivo_csv" not in request.files:
+        return jsonify({"result": "Nenhum arquivo enviado."})
+
+    file = request.files["arquivo_csv"]
+    if file.filename == "":
+        return jsonify({"result": "Nome de arquivo vazio."})
+
+    if not file.filename.endswith(".csv"):
+        return jsonify({"result": "Formato inválido. Envie um .csv."})
+
+    try:
+        filename = secure_filename(file.filename)
+        destino = os.path.join("Dados", filename)
+        file.save(destino)
+        return jsonify({"result": f"Arquivo '{filename}' enviado com sucesso."})
+    except Exception as e:
+        return jsonify({"result": f"Erro ao salvar arquivo: {e}"})
+
 
 #---------------------------------------------------------------------
 if __name__ == "__main__":

@@ -7,89 +7,95 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <!-- Topbar -->
- <nav class="navbar"></nav>
 
-
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <button id="toggleSidebar">☰</button>
-    <h3>Bases de dados</h3>
-    <ul id="item-list"></ul>
-
-    <h2>Query auto</h2>
-      <form id="form-consulta" method="post" action="/auto_query">
-        <div>
-          <label for="hash">Hash</label>
-          <input type="text" id="hash" name="hash" placeholder="00000000"/>
-        </div>
-        <div>
-          <label for="inicio">Hora de início</label>
-          <input type="datetime-local" id="inicio" name="inicio"/>
-        </div>
-        <div>
-          <label for="fim">Hora de fim</label>
-          <input type="datetime-local" id="fim" name="fim"/>
-        </div>
-        <div>
-          <label for="camera">Número da câmera</label>
-          <input type="number" id="camera" name="numero_camera" min="1" step="1"/>
-        </div>
-        
-        <div>
-          <label for="linha">Linha</label>
-          <select id="linha" name="linha">
-            <option value="">-- Escolha uma linha --</option>
-            <option value="Azul">Azul</option>
-            <option value="Vermelha">Vermelha</option>
-            <option value="Verde">Verde</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="estacao">Estação</label>
-          <select id="estacao" name="estacao">
-            <option value="">-- Escolha uma estação --</option>
-            <option value="Liberdade">Liberdade</option>
-            <option value="Sé">Sé</option>
-            <option value="Consolação">Consolação</option>
-            <option value="Jabaquara">Jabaquara</option>
-            <option value="Vila Madalena">Vila Madalena</option>
-          </select>
-        </div>
-
-        <button type="submit">Pesquisar</button>
-      </form>
-
-    <h3>Query SQL</h3>
-    <form id="sqlForm">
-      <textarea name="sql" rows="4" placeholder="SELECT * FROM dados WHERE numero_camera = 2" id="sqlTextBox"></textarea>
-      <button type="submit">Executar</button>
-    </form>
+  <!-- Topbar estilo programa -->
+  <div class="topbar">
+    <div class="menu">
+      <button class="menu-button">File ▾</button>
+      <div class="dropdown">
+        <a href="#" onclick="document.getElementById('csvInput').click()">Open</a>
+        <input type="file" id="csvInput" accept=".csv" style="display: none" />
+        <a href="#">Save</a>
+        <a href="#">Exit</a>
+      </div>
+    </div>
   </div>
 
-  <!-- Área direita (coluna) -->
-  <div class="right-side">
+  <!-- Container principal -->
+  <div class="container-principal">
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+      <button id="toggleSidebar">☰</button>
 
-    <!-- Conteúdo principal -->
-    <div class="main-content" id="mainContent">
-      <iframe src="{{ url_for('mapa') }}" width="100%" height="100%" frameborder="0"""></iframe>
+      <!-- Todo o conteúdo da sidebar encapsulado -->
+      <div class="sidebar-content">
+        <h3>Bases de dados</h3>
+        <ul id="item-list"></ul>
 
-     
+        <h2>Query auto</h2>
+        <form id="form-consulta" method="post" action="/auto_query">
+          <div>
+            <label for="hash">Hash</label>
+            <input type="text" id="hash" name="hash" placeholder="00000000"/>
+          </div>
+          <div>
+            <label for="inicio">Hora de início</label>
+            <input type="datetime-local" id="inicio" name="inicio"/>
+          </div>
+          <div>
+            <label for="fim">Hora de fim</label>
+            <input type="datetime-local" id="fim" name="fim"/>
+          </div>
+          <div>
+            <label for="camera">Número da câmera</label>
+            <input type="number" id="camera" name="numero_camera" min="1" step="1"/>
+          </div>
+          <div>
+            <label for="linha">Linha</label>
+            <select id="linha" name="linha">
+              <option value="">-- Escolha uma linha --</option>
+              <option value="Azul">Azul</option>
+              <option value="Vermelha">Vermelha</option>
+              <option value="Verde">Verde</option>
+            </select>
+          </div>
+          <div>
+            <label for="estacao">Estação</label>
+            <select id="estacao" name="estacao">
+              <option value="">-- Escolha uma estação --</option>
+              <option value="Liberdade">Liberdade</option>
+              <option value="Sé">Sé</option>
+              <option value="Consolação">Consolação</option>
+              <option value="Jabaquara">Jabaquara</option>
+              <option value="Vila Madalena">Vila Madalena</option>
+            </select>
+          </div>
+          <button type="submit">Pesquisar</button>
+        </form>
+
+        <h3>Query SQL</h3>
+        <form id="sqlForm">
+          <textarea name="sql" rows="4" placeholder="SELECT * FROM dados WHERE numero_camera = 2" id="sqlTextBox"></textarea>
+          <button type="submit">Executar</button>
+        </form>
+      </div>
     </div>
 
-    <!-- Barra de redimensionamento -->
-    <div class="resizer" id="resizer"></div>
-
-    <!-- Painel inferior -->
-    <div class="bottom-panel" id="bottomPanel">
-      <h3>Terminal ></h3>
-      <p>></p>
+    <!-- Área direita -->
+    <div class="right-side">
+      <div class="main-content" id="mainContent">
+        <iframe src="{{ url_for('mapa') }}" width="100%" height="100%" frameborder="0"></iframe>
+      </div>
+      <div class="resizer" id="resizer"></div>
+      <div class="bottom-panel" id="bottomPanel">
+        <h3>Terminal ></h3>
+        <p>></p>
+      </div>
     </div>
 
   </div>
 
-  <!-- Script -->
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

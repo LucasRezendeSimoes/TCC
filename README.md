@@ -69,6 +69,8 @@
 - Contagem de linhas do resultado da pesquisa
 - Query automatizadas (Linha e Estação referenciadas por informações da câmera cams.csv)
 - Adição de informações de cameras em /Dados/cams.csv
+- Topbar
+- Importe de arquivos para a lista de base de dados (File > Open)
 
 # Dependencias
 * 'python -m pip install duckdb flask pandas pyvis'

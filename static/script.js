@@ -165,5 +165,31 @@ async function carregarArquivos() {
   }
 }
 
+// --------------------- Lista da sidebar é atualizada automaticamente com arquivo adicionado
+document.getElementById("csvInput").addEventListener("change", async function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("arquivo_csv", file);
+
+  try {
+    const res = await fetch("/upload_csv", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+    bottomPanel.innerHTML = `<pre>${data.result}</pre>`;
+
+    // Recarrega a lista de arquivos
+    carregarArquivos();
+
+  } catch (err) {
+    bottomPanel.innerHTML = `<pre>Erro ao enviar arquivo: ${err}</pre>`;
+  }
+});
+
+
 // Carrega os arquivos ao iniciar
 carregarArquivos();
