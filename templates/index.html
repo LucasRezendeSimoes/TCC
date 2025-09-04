@@ -8,14 +8,14 @@
 </head>
 <body>
 
-  <!-- Topbar estilo programa -->
+  <!-- Topbar -->
   <div class="topbar">
     <div class="menu">
       <button class="menu-button">File ▾</button>
       <div class="dropdown">
         <a href="#" onclick="document.getElementById('csvInput').click()">Open</a>
         <input type="file" id="csvInput" accept=".csv" style="display: none" />
-        <a href="#">Save</a>
+        <a id="saveBtn">Save</a>
         <a href="#">Exit</a>
       </div>
     </div>
@@ -23,17 +23,28 @@
 
   <!-- Container principal -->
   <div class="container-principal">
-    
+
+    <!-- Barra de navegação de abas -->
+    <div class="icon-bar">
+      <button class="icon-button active" data-target="painel-arquivos" title="Arquivos">📁</button>
+      <button class="icon-button" data-target="painel-consultas" title="Consultas">🔍</button>
+      <button class="icon-button" data-target="painel-relatorios" title="Relatórios">📊</button>
+    </div>
+
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
+
       <button id="toggleSidebar">☰</button>
 
-      <!-- Todo o conteúdo da sidebar encapsulado -->
-      <div class="sidebar-content">
+      <!-- Painel de arquivos -->
+      <div class="sidebar-content active" id="painel-arquivos">
         <h3>Bases de dados</h3>
         <ul id="item-list"></ul>
+      </div>
 
-        <h2>Query auto</h2>
+      <!-- Painel de consultas (Auto + SQL) -->
+      <div class="sidebar-content" id="painel-consultas">
+        <h3>Consulta Automática</h3>
         <form id="form-consulta" method="post" action="/auto_query">
           <div>
             <label for="hash">Hash</label>
@@ -74,21 +85,31 @@
           <button type="submit">Pesquisar</button>
         </form>
 
-        <h3>Query SQL</h3>
+        <hr/>
+
+        <h3>Consulta SQL Manual</h3>
         <form id="sqlForm">
           <textarea name="sql" rows="4" placeholder="SELECT * FROM dados WHERE numero_camera = 2" id="sqlTextBox"></textarea>
           <button type="submit">Executar</button>
         </form>
       </div>
+
+      <!-- Painel de Relatórios -->
+      <div class="sidebar-content" id="painel-relatorios">
+        <h3>Relatórios</h3>
+        <p>Ainda não há relatórios</p>
+      </div>
+
     </div>
 
     <!-- Área direita -->
     <div class="right-side">
       <div class="main-content" id="mainContent">
         <iframe id="mapa-frame" src="/mapa" style="width: 100%; height: 100%; border: none;"></iframe>
-
       </div>
+
       <div class="resizer" id="resizer"></div>
+
       <div class="bottom-panel" id="bottomPanel">
         <h3>Terminal ></h3>
         <p>></p>
@@ -98,5 +119,6 @@
   </div>
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 </html>

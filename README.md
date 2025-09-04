@@ -52,10 +52,9 @@
 
 # Implementações:
 ## Implementações para fazer:
-- Exportar log
-- Diferenciação de log inválido e válido mas com 0 resultados
-- Importar e exportar Mapas
-- Importar e exportar DB
+- Destacar rota no mapa quando pesquisado por hash
+- Gráficos
+- Criação de relatórios de discrepancias
 - Atualizar .scv de banco de dados remoto
 
 ## Implementações feitas:
@@ -71,6 +70,10 @@
 - Adição de informações de cameras em /Dados/cams.csv
 - Topbar
 - Importe de arquivos para a lista de base de dados (File > Open)
+- Sidebar de navegação de abas
+- Destaque de camera pesquisada em AutoQuery
+- Exibir dados do vértice ao posicionar mouse sobre ele
+- Exportar log do terminal
 
 # Dependencias
 * 'python -m pip install duckdb flask pandas pyvis'

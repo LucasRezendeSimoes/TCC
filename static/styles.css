@@ -63,11 +63,39 @@ body {
   display: block;
 }
 
-/* Container principal: sidebar + right-side */
+/* Container principal: barra lateral + conteúdo */
 .container-principal {
   display: flex;
   height: calc(100vh - 35px); /* altura total - topbar */
   overflow: hidden;
+}
+
+/* Barra de ícones estilo VS Code */
+.icon-bar {
+  width: 40px;
+  background-color: #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 5px;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.icon-button:hover {
+  background-color: #333;
+}
+
+.icon-button.active {
+  background-color: #4c5053;
 }
 
 /* Sidebar */
@@ -79,8 +107,32 @@ body {
   transition: width 0.3s ease;
   overflow-x: hidden;
   font-size: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Sidebar recolhida (esconde conteúdo, mas mantém barra de ícones fora) */
+.sidebar.collapsed {
+  width: 40px;
+  overflow: hidden;
+}
+
+.sidebar.collapsed .sidebar-content {
+  display: none !important;
+}
+
+
+/* Painéis da sidebar */
+.sidebar-content {
+  display: none;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-content.active {
+  display: block;
+}
+
+/* Títulos e listas da sidebar */
 .sidebar h3 {
   margin-top: 0;
 }
@@ -88,6 +140,7 @@ body {
 .sidebar ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .sidebar ul li {
@@ -113,16 +166,6 @@ body {
   border-radius: 5px;
   width: 100%;
 }
-
-.sidebar.collapsed {
-  width: 40px;
-}
-
-/* Quando a sidebar estiver colapsada, esconde todo o conteúdo */
-.sidebar.collapsed .sidebar-content {
-  display: none;
-}
-
 
 /* Coluna direita */
 .right-side {
@@ -176,4 +219,35 @@ body {
 /* Textarea SQL */
 #sqlTextBox {
   resize: vertical;
+}
+
+
+#bottomPanel {
+  position: relative;
+  background-color: #111;
+  color: white;
+  padding: 10px;
+  height: 200px;
+  overflow-y: auto;
+  font-family: monospace;
+}
+
+#bottomPanel h3 {
+  margin: 0;
+  padding-right: 40px; /* espaço para o botão */
+  position: relative;
+}
+
+#exportCsvBtn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: #444;
+  border: 1px solid #888;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 10;
 }

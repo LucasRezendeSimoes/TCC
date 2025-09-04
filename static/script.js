@@ -192,5 +192,102 @@ document.getElementById("csvInput").addEventListener("change", async function ()
   }
 });
 
+
+// Alternar painéis da barra lateral ao clicar nos ícones
+document.querySelectorAll('.icon-button').forEach(button => {
+      button.addEventListener('click', () => {
+        const targetId = button.getAttribute('data-target');
+
+        // Marcar botão ativo
+        document.querySelectorAll('.icon-button').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        // Alternar painéis
+        document.querySelectorAll('.sidebar-content').forEach(painel => {
+          if (painel.id === targetId) {
+            painel.classList.add('active');
+            painel.style.display = 'block';
+          } else {
+            painel.classList.remove('active');
+            painel.style.display = 'none';
+          }
+        });
+
+        // Expandir sidebar se estiver colapsada
+        document.getElementById('sidebar').classList.remove('collapsed');
+      });
+  });
+
+
+
+ // Exportar conteúdo do log
+document.getElementById('saveBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+
+  const terminalElement = document.getElementById('bottomPanel');
+  if (!terminalElement) {
+    console.log("Elemento bottomPanel não encontrado");
+    return;
+  }
+
+  const linhas = terminalElement.innerText.split('\n');
+
+  const linhasFiltradas = linhas
+    .map(line => line.trim())
+    .filter(line => {
+      if (!line) return false;
+      if (line.toLowerCase() === "none") return false;
+      if (/^\d+\s+resultado\(s\)\s+encontrado\(s\)/i.test(line)) return false;
+      return true;
+    });
+
+  if (linhasFiltradas.length === 0) {
+    alert("Nenhum dado encontrado para salvar.");
+    return;
+  }
+
+  const csvData = linhasFiltradas.map((line, index) => {
+    // Se for o cabeçalho (primeira linha), separa por qualquer espaço(s)
+    const parts = index === 0
+      ? line.split(/\s+/)
+      : line.split(/\s{2,}/);
+
+    // Aspas para campos com vírgulas
+    return parts.map(part => {
+      const trimmed = part.trim();
+      return trimmed.includes(',') ? `"${trimmed}"` : trimmed;
+    }).join(',');
+  });
+
+  const csvContent = csvData.join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  const fileName = prompt("Digite o nome do arquivo para salvar (com extensão .csv):", "terminal_output.csv");
+  if (!fileName) {
+    URL.revokeObjectURL(url);
+    return;
+  }
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  link.style.display = 'none';
+
+  document.body.appendChild(link);
+  link.click();
+
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+});
+
+
+
+
+
+
+
+
 // Carrega os arquivos ao iniciar
 carregarArquivos();
