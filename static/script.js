@@ -32,8 +32,6 @@ window.addEventListener("mouseup", () => {
   document.body.style.cursor = "default";
 });
 
-
-
 // --------------------- FORM 1: SQL manual
 document.getElementById("sqlForm").addEventListener("submit", async function(e) {
   e.preventDefault();
@@ -61,8 +59,6 @@ document.getElementById("sqlForm").addEventListener("submit", async function(e) 
     bottomPanel.innerHTML = `<pre>Erro de conexão: ${err}</pre>`;
   }
 });
-
-
 
 // --------------------- FORM 2: Query automática
 document.getElementById("form-consulta").addEventListener("submit", async function (e) {
@@ -103,12 +99,18 @@ document.getElementById("form-consulta").addEventListener("submit", async functi
     }
 
     bottomPanel.innerHTML = `<pre>${data.result}</pre>`;
+
+    if (camera) {
+      document.getElementById("mapa-frame").src = "/mapa?numero_camera=" + camera;
+    } else {
+      document.getElementById("mapa-frame").src = "/mapa";
+    }
+
+
   } catch (err) {
     bottomPanel.innerHTML = `<pre>Erro de conexão: ${err}</pre>`;
   }
 });
-
-
 
 // --------------------- Carregar lista de arquivos e conteúdo ao clicar
 async function carregarArquivos() {
@@ -189,7 +191,6 @@ document.getElementById("csvInput").addEventListener("change", async function ()
     bottomPanel.innerHTML = `<pre>Erro ao enviar arquivo: ${err}</pre>`;
   }
 });
-
 
 // Carrega os arquivos ao iniciar
 carregarArquivos();

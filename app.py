@@ -146,8 +146,12 @@ def arquivos():
 @app.route("/mapa")
 def mapa():
     from mapa import gerar_grafo
-    gerar_grafo()
+
+    numero_camera = request.args.get("numero_camera")
+    gerar_grafo(numero_camera=numero_camera)  # passa para o mapa.py
+
     return app.send_static_file("mapas/mapa.html")
+
 
 #---------------------------------------------------------------------
 @app.route("/upload_csv", methods=["POST"])
