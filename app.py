@@ -152,6 +152,38 @@ def mapa():
 
     return app.send_static_file("mapas/mapa.html")
 
+#---------------------------------------------------------------------
+@app.route("/hash_mapa")
+def hash_mapa():
+    from mapa import gerar_grafo_por_hash
+    hash_val = request.args.get("hash")
+
+    if not hash_val:
+        return "Hash não fornecida", 400
+
+    try:
+        carregar_tabela("movimentacao_pessoas_cameras.csv")  # use o nome real do seu arquivo
+
+        df = con.execute(f"""
+            SELECT numero_camera 
+            FROM dados 
+            WHERE hash = '{hash_val}'
+            ORDER BY horario_primeira_aparicao
+        """).fetchdf()
+
+        print("Câmeras encontradas para hash:", hash_val, df["numero_camera"].tolist())
+
+        if df.empty:
+            return f"Nenhuma câmera encontrada para a hash '{hash_val}'", 404
+
+        caminho = gerar_grafo_por_hash(df["numero_camera"].tolist())
+        return app.send_static_file("mapas/mapa.html")
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return f"Erro ao gerar mapa para hash: {e}", 500
+
 
 #---------------------------------------------------------------------
 @app.route("/upload_csv", methods=["POST"])

@@ -100,8 +100,15 @@ document.getElementById("form-consulta").addEventListener("submit", async functi
 
     bottomPanel.innerHTML = `<pre>${data.result}</pre>`;
 
+    // Se tem hash no input
     if (camera) {
       document.getElementById("mapa-frame").src = "/mapa?numero_camera=" + camera;
+    } else if (hash) {
+        // Faz a requisição para gerar o grafo
+      await fetch("/hash_mapa?hash=" + encodeURIComponent(hash));
+      // Atualiza o iframe com "cache busting"
+      const timestamp = new Date().getTime();
+      document.getElementById("mapa-frame").src = "/static/mapas/mapa.html?t=" + timestamp;
     } else {
       document.getElementById("mapa-frame").src = "/mapa";
     }
@@ -281,12 +288,6 @@ document.getElementById('saveBtn').addEventListener('click', function(e) {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 });
-
-
-
-
-
-
 
 
 // Carrega os arquivos ao iniciar
