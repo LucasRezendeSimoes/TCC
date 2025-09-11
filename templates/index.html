@@ -29,6 +29,8 @@
       <button class="icon-button active" data-target="painel-arquivos" title="Arquivos">📁</button>
       <button class="icon-button" data-target="painel-consultas" title="Consultas">🔍</button>
       <button class="icon-button" data-target="painel-relatorios" title="Relatórios">📊</button>
+      <button class="icon-button" data-target="painel-duvidas" title="Dúvidas frequentes">❓</button>
+      <button class="icon-button" data-target="painel-creditos" title="Créditos">🧑‍💻</button>
     </div>
 
     <!-- Sidebar -->
@@ -97,8 +99,99 @@
       <!-- Painel de Relatórios -->
       <div class="sidebar-content" id="painel-relatorios">
         <h3>Relatórios</h3>
-        <p>Ainda não há relatórios</p>
+        <ul id="relatorios-lista">
+          {% if relatorios and relatorios|length > 0 %}
+            {% for rel in relatorios %}
+              <li>{{ rel }}</li>
+            {% endfor %}
+          {% else %}
+            <li><em>Ainda não há relatórios.</em></li>
+          {% endif %}
+        </ul>
       </div>
+
+
+      <!-- Painel de duvidas frequentes -->
+      <div class="sidebar-content" id="painel-duvidas">
+        <h3>Dúvidas Frequentes</h3>
+
+        <div class="faq-categoria">
+          <h4>1. Sobre a base de dados</h4>
+          <div class="faq-item">
+            <button class="faq-question">Os inputs funcionam em qualquer base de dados?</button>
+            <div class="faq-answer">
+              <p>Não. Os inputs funcionam apenas na base de dados atualmente selecionada. Se você mudar a base, os dados disponíveis e os resultados podem mudar.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">Como me referir à base selecionada nas queries SQL?</button>
+            <div class="faq-answer">
+              <p>Ao fazer queries SQL, sempre se refira à base selecionada pelo nome <code>dados</code>. Isso garante que a query opere na base certa, evitando confusões.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-categoria">
+          <h4>2. Queries SQL e análise de dados</h4>
+          <div class="faq-item">
+            <button class="faq-question">Posso usar qualquer tabela nas queries?</button>
+            <div class="faq-answer">
+              <p>Você deve usar as tabelas que existem na base selecionada. Normalmente as tabelas usadas são <code>cams</code> para câmeras, <code>grafo</code> para conexões, e tabelas de movimento para trajetos.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">Como faço para analisar discrepâncias nos trajetos?</button>
+            <div class="faq-answer">
+              <p>Recomenda-se usar o script <code>relatorio.py</code> que lê os dados de movimento e gera relatórios JSON com erros e buracos identificados usando o grafo de conexões.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-categoria">
+          <h4>3. Visualização e mapas</h4>
+          <div class="faq-item">
+            <button class="faq-question">Como visualizar os trajetos e conexões das câmeras?</button>
+            <div class="faq-answer">
+              <p>Use o módulo <code>mapa.py</code> para gerar gráficos interativos em HTML, que mostram câmeras, conexões e rotas percorridas com cores e legendas.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">Posso destacar uma câmera específica no mapa?</button>
+            <div class="faq-answer">
+              <p>Sim, ao gerar o grafo você pode passar o número da câmera para que ela seja destacada em laranja no mapa.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel de Créditos aos desenvolvedores -->
+      <div class="sidebar-content" id="painel-creditos" style="padding: 15px; font-family: monospace; color: #fff;">
+        <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">🎓 Créditos</h3>
+
+        <pre style="color: #00ffff; font-weight: bold; font-size: 11px;">
+.-.   .       .--      
+`-.. .|-.. . .|- . ..-,
+`-''-'`-' ` ` '--'-|`'-
+                 `-'   
+        </pre>
+
+        <p style="margin: 10px 0 5px;"><strong>Projeto:</strong> SubwEye</p>
+        <p><strong>Curso:</strong> 8º semestre - Ciências da Computação</p>
+        <p><strong>Instituição:</strong> FEI – 2025</p>
+
+        <hr style="border: 0; border-top: 1px solid #666; margin: 10px 0;">
+
+        <p style="margin: 0;"><strong>Desenvolvedores:</strong></p>
+        <ul style="list-style-type: none; padding-left: 10px;">
+          <li>• Fernando Milani Venerando<br><small style="color: #aaa;">RA: 24.122.063-1</small></li>
+          <li>• Lucas Rezende Simões<br><small style="color: #aaa;">RA: 24.122.028-4</small></li>
+        </ul>
+      </div>
+
+      
 
     </div>
 

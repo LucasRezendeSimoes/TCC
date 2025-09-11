@@ -105,7 +105,13 @@ document.getElementById("form-consulta").addEventListener("submit", async functi
       document.getElementById("mapa-frame").src = "/mapa?numero_camera=" + camera;
     } else if (hash) {
         // Faz a requisição para gerar o grafo
-      await fetch("/hash_mapa?hash=" + encodeURIComponent(hash));
+      const url = new URL("/hash_mapa", window.location.origin);
+      url.searchParams.append("hash", hash);
+      if (arquivoSelecionado) {
+        url.searchParams.append("arquivo", arquivoSelecionado);
+      }
+      await fetch(url.toString());
+
       // Atualiza o iframe com "cache busting"
       const timestamp = new Date().getTime();
       document.getElementById("mapa-frame").src = "/static/mapas/mapa.html?t=" + timestamp;
@@ -224,6 +230,49 @@ document.querySelectorAll('.icon-button').forEach(button => {
         document.getElementById('sidebar').classList.remove('collapsed');
       });
   });
+
+
+
+  // Carregar lista de relatorios
+  async function carregarRelatorios() {
+  try {
+    const res = await fetch("/api/relatorios");
+    const data = await res.json();
+
+    const lista = document.getElementById("lista-relatorios");
+    lista.innerHTML = "";
+
+    if (data.relatorios.length === 0) {
+      lista.innerHTML = "<p>Ainda não há relatórios.</p>";
+      return;
+    }
+
+    data.relatorios.forEach(nome => {
+      const li = document.createElement("li");
+      li.textContent = nome;
+      lista.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error("Erro ao buscar relatórios:", err);
+  }
+}document.querySelector('[data-target="painel-relatorios"]').addEventListener("click", carregarRelatorios);
+
+
+// Mostrar resposta de pergunta em "Perguntas frequentes"
+document.querySelectorAll('.faq-question').forEach(button => {
+  button.addEventListener('click', () => {
+    const answer = button.nextElementSibling;
+    if (answer.classList.contains('active')) {
+      // Fecha a resposta
+      answer.classList.remove('active');
+    } else {
+      // Abre a resposta
+      answer.classList.add('active');
+    }
+  });
+});
+
 
 
 

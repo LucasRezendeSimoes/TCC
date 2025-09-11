@@ -3,6 +3,12 @@ import duckdb
 import os
 import pandas as pd
 from werkzeug.utils import secure_filename
+
+# Importações para a thread de relatórios
+import threading
+import time
+from relatorio import gerar_relatorios_automaticamente
+
 #---------------------------------------------------------------------
 app = Flask(__name__)
 
@@ -18,6 +24,43 @@ def carregar_tabela(nome_arquivo):
     """)
 
 #---------------------------------------------------------------------
+# Thread para gerar relatórios em segundo plano
+def loop_relatorios():
+    while True:
+        gerar_relatorios_automaticamente()
+        time.sleep(60)
+
+threading.Thread(target=loop_relatorios, daemon=True).start()
+
+RELATORIOS_DIR = "Relatorios"
+
+@app.route('/relatorios')
+def relatorios():
+    # lista os arquivos na pasta Relatorios
+    arquivos = [f for f in os.listdir(RELATORIOS_DIR) if f.endswith(".jsonl")]
+    return render_template("relatorios.html", arquivos=arquivos)
+
+def listar_relatorios():
+    caminho = "Relatorios"
+    if not os.path.exists(caminho):
+        return []
+    arquivos = [f for f in os.listdir(caminho) if f.endswith(".jsonl")]
+    return arquivos
+
+@app.route("/api/relatorios")
+def api_relatorios():
+    arquivos = [f for f in os.listdir(RELATORIOS_DIR) if f.endswith(".jsonl")]
+    return jsonify({"relatorios": arquivos})
+
+
+def listar_arquivos_soa():
+    caminho = "SOA"
+    arquivos = [f for f in os.listdir(caminho) if f.endswith(".csv")]
+    return arquivos
+
+
+
+#---------------------------------------------------------------------
 @app.route("/carregar_base", methods=["POST"])
 def carregar_base():
     arquivo = request.form.get("arquivo")
@@ -31,9 +74,11 @@ def carregar_base():
         return jsonify({"result": f"Erro ao carregar base: {e}"})
 
 #---------------------------------------------------------------------
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    arquivos_soa = listar_arquivos_soa()
+    relatorios = listar_relatorios()
+    return render_template('index.html', arquivos_soa=arquivos_soa, relatorios=relatorios)
 
 #---------------------------------------------------------------------
 @app.route("/query", methods=["POST"])
@@ -148,7 +193,7 @@ def mapa():
     from mapa import gerar_grafo
 
     numero_camera = request.args.get("numero_camera")
-    gerar_grafo(numero_camera=numero_camera)  # passa para o mapa.py
+    gerar_grafo(numero_camera=numero_camera)
 
     return app.send_static_file("mapas/mapa.html")
 
@@ -156,13 +201,15 @@ def mapa():
 @app.route("/hash_mapa")
 def hash_mapa():
     from mapa import gerar_grafo_por_hash
+
     hash_val = request.args.get("hash")
+    arquivo = request.args.get("arquivo", "movimentacao_pessoas_cameras.csv")
 
     if not hash_val:
         return "Hash não fornecida", 400
 
     try:
-        carregar_tabela("movimentacao_pessoas_cameras.csv")  # use o nome real do seu arquivo
+        carregar_tabela(arquivo)
 
         df = con.execute(f"""
             SELECT numero_camera 
@@ -184,7 +231,6 @@ def hash_mapa():
         traceback.print_exc()
         return f"Erro ao gerar mapa para hash: {e}", 500
 
-
 #---------------------------------------------------------------------
 @app.route("/upload_csv", methods=["POST"])
 def upload_csv():
@@ -205,7 +251,6 @@ def upload_csv():
         return jsonify({"result": f"Arquivo '{filename}' enviado com sucesso."})
     except Exception as e:
         return jsonify({"result": f"Erro ao salvar arquivo: {e}"})
-
 
 #---------------------------------------------------------------------
 if __name__ == "__main__":

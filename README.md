@@ -52,9 +52,7 @@
 
 # Implementações:
 ## Implementações para fazer:
-- Destacar rota no mapa quando pesquisado por hash
 - Gráficos
-- Criação de relatórios de discrepancias
 - Atualizar .scv de banco de dados remoto
 
 ## Implementações feitas:
@@ -73,7 +71,11 @@
 - Sidebar de navegação de abas
 - Destaque de camera pesquisada em AutoQuery
 - Exibir dados do vértice ao posicionar mouse sobre ele
-- Exportar log do terminal
+- Exportar log do terminal (File > Save)
+- Destacar fluxo pesquisado no mapa
+- Detectar discrepancias (Primeiro vertice deve ser de entrada, últimop vertice deve ser de saída e fluxo contínuo)
+- Procurar e destacar no mapa vertices e erastas hipotéticos e destacar no mapa
+- Salvar discrepâncias num relatório automaticamente  
 
 # Dependencias
 * 'python -m pip install duckdb flask pandas pyvis'
