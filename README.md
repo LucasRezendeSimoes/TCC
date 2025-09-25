@@ -55,6 +55,7 @@
 ### Pequenas mudanças pendentes:
 - Destacar BD e relatório vinculado ao mongo na lista de DBs
 - Preencher buracos de trajeto corretamente
+- Permitir AutoQuery de mais de um valor (Ex: "aaaaaaaa, bbbbbbbb")
 - Revisar Dúvidas frequentes
 - Adicionar hiperlinks de navegação na aba de dúvidas
 - Vincular OutputMongo xom atualizações de relatórios
