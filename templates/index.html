@@ -141,14 +141,14 @@
           <div class="faq-item">
             <button class="faq-question">Os inputs funcionam em qualquer base de dados?</button>
             <div class="faq-answer">
-              <p>Não. Os inputs funcionam apenas na base de dados atualmente selecionada. Se você mudar a base, os dados disponíveis e os resultados podem mudar.</p>
+              <p>Não. Os inputs funcionam apenas na base de dados atualmente selecionada. Pode acessar e selecionar as bases de dados disponíveis na aba Bases de dados</p>
             </div>
           </div>
 
           <div class="faq-item">
             <button class="faq-question">Como me referir à base selecionada nas queries SQL?</button>
             <div class="faq-answer">
-              <p>Ao fazer queries SQL, sempre se refira à base selecionada pelo nome <code>dados</code>. Isso garante que a query opere na base certa, evitando confusões.</p>
+              <p>Ao fazer queries SQL, indeependente do nome da base, sempre se refira à base selecionada pelo nome <code>dados</code>. Isso garante que a query opere na base correta atualmente selecionada</p>
             </div>
           </div>
         </div>
@@ -163,9 +163,9 @@
           </div>
 
           <div class="faq-item">
-            <button class="faq-question">Como faço para analisar discrepâncias nos trajetos?</button>
+            <button class="faq-question">Como faço para analisar discrepâncias nos trajetos dos das bases de dados?</button>
             <div class="faq-answer">
-              <p>Recomenda-se usar o script <code>relatorio.py</code> que lê os dados de movimento e gera relatórios JSON com erros e buracos identificados usando o grafo de conexões.</p>
+              <p>O script <code>relatorio.py</code> automaticamente lê os dados de movimento e gera relatórios JSON com erros e buracos identificados usando o grafo de conexões. Os relatórios podem ser acessados na aba Relatórios</p>
             </div>
           </div>
         </div>
@@ -175,14 +175,24 @@
           <div class="faq-item">
             <button class="faq-question">Como visualizar os trajetos e conexões das câmeras?</button>
             <div class="faq-answer">
-              <p>Use o módulo <code>mapa.py</code> para gerar gráficos interativos em HTML, que mostram câmeras, conexões e rotas percorridas com cores e legendas.</p>
+              <p>O mapa das câmeras, junto com suas conexões e parâmetros são gerados sutomaticamente na guia a direita quando selecionado a aba Mapa. Pode-se visualizar uma câmera específica no mapa pesquisando pelo seu número ou visualizar o trajeto de uma hash, buscando na aba Pesquisa</p>
             </div>
           </div>
 
           <div class="faq-item">
-            <button class="faq-question">Posso destacar uma câmera específica no mapa?</button>
+            <button class="faq-question">Posso procurar uma câmera específica no mapa?</button>
             <div class="faq-answer">
               <p>Sim, ao gerar o grafo você pode passar o número da câmera para que ela seja destacada em laranja no mapa.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-categoria">
+          <h4>4. Importação e exportação de arquivos</h4>
+          <div class="faq-item">
+            <button class="faq-question">Pergunta</button>
+            <div class="faq-answer">
+              <p>Resposta</p>
             </div>
           </div>
         </div>
@@ -267,4 +277,5 @@
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
+
 </html>
