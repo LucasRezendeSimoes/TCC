@@ -56,6 +56,7 @@
 - Destacar BD e relatório vinculado ao mongo na lista de DBs
 - Preencher buracos de trajeto corretamente
 - Revisar Dúvidas frequentes
+- Adicionar hiperlinks de navegação na aba de dúvidas
 - Vincular OutputMongo xom atualizações de relatórios
 - Mudar grafo.csv e cams.csv da pasta Dados para a pasta Assets(Exemplo)
 - Permitir alteração de arquivos da pasta Assets
