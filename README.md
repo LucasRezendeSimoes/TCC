@@ -60,6 +60,7 @@
 - Adicionar hiperlinks de navegação na aba de dúvidas
 - Vincular OutputMongo xom atualizações de relatórios
 - Mudar grafo.csv e cams.csv da pasta Dados para a pasta Assets(Exemplo)
+- Adicionar arquivo que define posição X,Y de vértices no grafo
 - Permitir alteração de arquivos da pasta Assets
 - Ao alterar arquivos da pasta Assets, revisar e reescrever relatórios ja existentes
 - Visualizar relatórios
