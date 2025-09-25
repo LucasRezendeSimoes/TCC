@@ -52,6 +52,16 @@
 
 # Implementações:
 ## Implementações para fazer:
+### Pequenas mudanças pendentes:
+- Destacar BD e relatório vinculado ao mongo na lista de DBs
+- Preencher buracos de trajeto corretamente
+- Revisar Dúvidas frequentes
+- Vincular OutputMongo xom atualizações de relatórios
+- Mudar grafo.csv e cams.csv da pasta Dados para a pasta Assets(Exemplo)
+- Permitir alteração de arquivos da pasta Assets
+- Ao alterar arquivos da pasta Assets, revisar e reescrever relatórios ja existentes
+- Visualizar relatórios
+- Exportar relatórios
 
 ## Implementações feitas:
 - Função que gera dados para testes
