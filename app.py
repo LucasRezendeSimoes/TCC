@@ -3,11 +3,15 @@ import duckdb
 import os
 import pandas as pd
 from werkzeug.utils import secure_filename
+import json
 
 # Importações para a thread de relatórios
 import threading
 import time
 from relatorio import gerar_relatorios_automaticamente
+
+from Funcoes_auxiliares.InputMongo import InputMongo
+from Funcoes_auxiliares.OutputMongo import OutputMongo
 
 #---------------------------------------------------------------------
 app = Flask(__name__)
@@ -97,6 +101,134 @@ def query():
         return jsonify({"result": result_str})
     except Exception as e:
         return jsonify({"result": f"Erro na consulta: {e}"})
+
+#---------------------------------------------------------------------
+# Envia dados para criar estatísticas
+@app.route("/stats", methods=["GET"])
+def stats():
+    arquivo = request.args.get('arquivo')
+    if not arquivo:
+        return jsonify({"erro": "Arquivo não especificado"}), 400
+
+    print(f"[stats] Arquivo solicitado: {arquivo}")
+
+    # 1. Carregar base
+    try:
+        carregar_tabela(arquivo)
+        print("[stats] tabela carregada com sucesso")
+    except Exception as e:
+        print("[stats] Erro ao carregar base:", e)
+        return jsonify({"erro": f"Erro ao carregar CSV: {str(e)}"}), 400
+
+    # 2. Ler dados
+    try:
+        df = con.execute("SELECT * FROM dados").fetchdf()
+        print(f"[stats] número de registros na base: {len(df)}")
+    except Exception as e:
+        print("[stats] Erro ao ler dados da tabela 'dados':", e)
+        return jsonify({"erro": f"Erro ao ler dados: {str(e)}"}), 500
+
+    # caminho para ler cams.csv
+    try:
+        cams = pd.read_csv("Dados/cams.csv")
+        print(f"[stats] cams.csv lido, colunas: {cams.columns.tolist()}")
+    except Exception as e:
+        print("[stats] Erro ao ler cams.csv:", e)
+        return jsonify({"erro": f"Erro ao ler arquivo cams.csv: {str(e)}"}), 500
+
+    # checar colunas necessárias
+    required_cols = ['hash', 'horario_primeira_aparicao', 'numero_camera']
+    for col in required_cols:
+        if col not in df.columns:
+            print(f"[stats] Coluna obrigatória ausente no evento: {col}, colunas disponíveis: {df.columns.tolist()}")
+            return jsonify({"erro": f"Coluna obrigatória ausente: {col}", "colunas_disponiveis": df.columns.tolist()}), 400
+
+    # Unir com cams
+    try:
+        df = df.merge(cams, left_on='numero_camera', right_on='Número da camera', how='left')
+        print(f"[stats] merge com cams realizado, colunas agora: {df.columns.tolist()}")
+    except Exception as e:
+        print("[stats] Erro no merge com cams:", e)
+        return jsonify({"erro": f"Erro no merge com cams.csv: {str(e)}"}), 500
+
+    # conversão de data
+    try:
+        df['data'] = pd.to_datetime(df['horario_primeira_aparicao'], errors='coerce').dt.date
+        print("[stats] coluna data criada com sucesso")
+    except Exception as e:
+        print("[stats] Erro ao converter horario_primeira_aparicao em data:", e)
+        return jsonify({"erro": f"Erro ao converter data: {str(e)}"}), 500
+
+    # Verificar colunas estacao e Linha
+    if 'Estação' not in df.columns or 'Linha' not in df.columns or 'hash' not in df.columns:
+        print(f"[stats] Colunas de estação ou linha ou hash faltando. Colunas do df: {df.columns.tolist()}")
+        return jsonify({
+            "erro": "Colunas esperadas não encontradas: 'Estação', 'Linha' ou 'hash'.",
+            "colunas_disponiveis": df.columns.tolist()
+        }), 400
+
+    # Agora agrupar
+    try:
+        estacoes_por_dia = (
+            df.groupby(['data', 'Estação'])['hash']
+            .count()
+            .reset_index(name='contagem')
+            .sort_values('data')
+        )
+        linhas_por_dia = (
+            df.groupby(['data', 'Linha'])['hash']
+            .count()
+            .reset_index(name='contagem')
+            .sort_values('data')
+        )
+        print("[stats] agrupamentos por estação e linha feitos")
+    except Exception as e:
+        print("[stats] Erro no agrupamento:", e)
+        return jsonify({"erro": f"Erro no agrupamento: {str(e)}"}), 500
+
+    # rotas ok / erro — você pode ajustar a lógica real depois
+    try:
+        total_hashes = df['hash'].nunique()
+
+        # Caminho do arquivo JSONL do relatório de erros (ajuste o caminho conforme seu projeto)
+        nome_relatorio = f"relatorio_erros_{arquivo.replace('.csv','.jsonl')}"
+        caminho_relatorio = os.path.join("Relatorios", nome_relatorio)
+
+        hashes_com_erro = set()
+        if os.path.exists(caminho_relatorio):
+            with open(caminho_relatorio, encoding='utf-8') as f:
+                for line in f:
+                    try:
+                        dado = json.loads(line)
+                        hashes_com_erro.add(dado.get('hash'))
+                    except:
+                        pass
+
+        rotas_erros = len(hashes_com_erro)
+        rotas_ok = total_hashes - rotas_erros
+
+        print(f"[stats] rotas_ok: {rotas_ok}, rotas_erros: {rotas_erros}")
+
+    except Exception as e:
+        print("[stats] Erro ao calcular rotas OK/Erro:", e)
+        return jsonify({"erro": f"Erro ao calcular rotas: {str(e)}"}), 500
+
+    except Exception as e:
+        print("[stats] Erro ao contar rotas:", e)
+        return jsonify({"erro": f"Erro ao contar rotas: {str(e)}"}), 500
+
+
+    nome_db = nome_db = arquivo  # simples, mostra o nome do arquivo enviado
+
+    return jsonify({
+        "nomeDB": nome_db,
+        "total": len(df),
+        "total_trajetos": total_hashes,
+        "estacoes_por_dia": estacoes_por_dia.to_dict(orient='records'),
+        "linhas_por_dia": linhas_por_dia.to_dict(orient='records'),
+        "rotas_ok": int(rotas_ok),
+        "rotas_erros": int(rotas_erros)
+    })
 
 #---------------------------------------------------------------------
 @app.route("/auto_query", methods=["POST"])
@@ -254,4 +386,9 @@ def upload_csv():
 
 #---------------------------------------------------------------------
 if __name__ == "__main__":
+    # Inicia as threads de input/output Mongo
+    InputMongo(num_hashes=20, intervalo=5, lote_tamanho=10).start()
+    OutputMongo(caminho_csv="Dados/mov_mongo_2025.csv", intervalo=10).start()
+
+    # Inicia o servidor Flask
     app.run(debug=True)

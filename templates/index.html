@@ -5,21 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TCC</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="menu">
-      <button class="menu-button">File ▾</button>
-      <div class="dropdown">
-        <a href="#" onclick="document.getElementById('csvInput').click()">Open</a>
-        <input type="file" id="csvInput" accept=".csv" style="display: none" />
-        <a id="saveBtn">Save</a>
-        <a href="#">Exit</a>
+<!-- Topbar -->
+<div class="topbar">
+  <!-- File -->
+  <div class="menu">
+    <button class="menu-button">File ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="document.getElementById('csvInput').click()">Open</a>
+      <input type="file" id="csvInput" accept=".csv" style="display: none" />
+      <a id="saveBtn">Save</a>
+      <a href="#">Exit</a>
+    </div>
+  </div>
+
+  <!-- Edit -->
+  <div class="menu">
+    <button class="menu-button">Edit ▾</button>
+    <div class="dropdown">
+      <!-- Submenu: Themes -->
+      <div class="menu">
+        <a href="#">Themes ▸</a>
+        <div class="dropdown" style="left: 100%; top: 0;">
+          <a href="#" id="tema-escuro">Escuro</a>
+          <a href="#" id="tema-claro">Claro</a>
+          <a href="#" id="tema-cyberpunk">Cyberpunk 2077</a>
+        </div>
       </div>
     </div>
   </div>
+</div>
+
+
+</div>
 
   <!-- Container principal -->
   <div class="container-principal">
@@ -190,23 +211,55 @@
           <li>• Lucas Rezende Simões<br><small style="color: #aaa;">RA: 24.122.028-4</small></li>
         </ul>
       </div>
-
-      
-
     </div>
+
+    
 
     <!-- Área direita -->
     <div class="right-side">
-      <div class="main-content" id="mainContent">
+
+      <div id="modo-toggle">
+        <button id="btnMapa" class="active">Mapa</button>
+        <button id="btnStats">Estatísticas</button>
+      </div>
+
+      <div class="main-content" id="mapa-container">
         <iframe id="mapa-frame" src="/mapa" style="width: 100%; height: 600px; border: none;"></iframe>
       </div>
 
-      <div class="resizer" id="resizer"></div>
+      <div class="main-content" id="stats-container" style="display: none; padding: 20px;">
+        <!-- Filtros de tempo -->
+        <div class="time-filters">
+          <button data-range="1D" class="time-btn active">1D</button>
+          <button data-range="7D" class="time-btn">1 Semana</button>
+          <button data-range="1M" class="time-btn">1 Mês</button>
+          <button data-range="1Y" class="time-btn">1 Ano</button>
+          <button data-range="MAX" class="time-btn">Máx</button>
+        </div>
 
+        <!-- Cartão de total de dados -->
+        <div id="dataSummary" class="card">
+          <h3 id="nomeDB">DB:</h3>
+          <p id="totalDados">Carregando...</p>
+          <p id="totalTrajetos">Carregando...</p>
+        </div>
+
+        <!-- Gráfico de linha uso estações -->
+        <canvas id="graficoEstacoes" width="600" height="300"></canvas>
+
+        <!-- Gráfico de linha uso linhas -->
+        <canvas id="graficoLinhas" width="600" height="300"></canvas>
+
+        <!-- Gráfico pizza rotas OK / com erros -->
+        <canvas id="graficoRotas" width="400" height="400"></canvas>
+      </div>  
+
+      <div class="resizer" id="resizer"></div>
       <div class="bottom-panel" id="bottomPanel">
         <h3>Terminal ></h3>
         <p>></p>
       </div>
+
     </div>
 
   </div>

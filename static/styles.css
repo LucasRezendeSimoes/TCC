@@ -1,21 +1,105 @@
-/* Reset do body */
+/* ======================== */
+/*         TEMAS           */
+/* ======================== */
+
+:root {
+  /* Tema escuro - padrão */
+  --bg-main: #000000;
+  --bg-panel: #2c2f33;
+  --bg-sidebar: #343a40;
+  --bg-sidebar-alt: #1e1e1e;
+  --bg-hover: #444;
+  --bg-secondary: #111;
+  --bg-faq: #212529;
+
+  --text-color: white;
+  --text-muted: #e9ecef;
+  --text-invert: #111;
+
+  --border-color: #444;
+  --border-color-light: #495057;
+
+  --btn-bg: #495057;
+  --btn-bg-hover: #333;
+  --btn-bg-active: #4c5053;
+  --btn-alt: #444;
+
+  --card-bg: #161616;
+  --highlight: lime;
+}
+
+body.light-theme {
+  --bg-main: #f5f5f5;
+  --bg-panel: #ffffff;
+  --bg-sidebar: #e9ecef;
+  --bg-sidebar-alt: #d3d3d3;
+  --bg-hover: #ddd;
+  --bg-secondary: #f0f0f0;
+  --bg-faq: #f8f9fa;
+
+  --text-color: #2d2d2d;
+  --text-muted: #333;
+  --text-invert: white;
+
+  --border-color: #ccc;
+  --border-color-light: #bbb;
+
+  --btn-bg: #e0e0e0;
+  --btn-bg-hover: #ccc;
+  --btn-bg-active: #bbb;
+  --btn-alt: #ddd;
+
+  --card-bg: #ffffff;
+  --highlight: green;
+}
+body.theme2077 {
+  --bg-main: #0f0f17; /* fundo quase preto azulado */
+  --bg-panel: #1a1a29; /* barra superior e painéis */
+  --bg-sidebar: #240046; /* sidebar roxa */
+  --bg-sidebar-alt: #120b2e; /* barra lateral escura com tom roxo */
+  --bg-hover: #720026; /* hover vermelho neon */
+  --bg-secondary: #1a1a29; /* fundo secundário */
+  --bg-faq: #1a1a29;
+
+  --text-color: #e0d7f5;
+  --text-muted: #b0a8d8;
+  --text-invert: #1a1a29;
+
+  --border-color: #720026;
+  --border-color-light: #aa00ff;
+
+  --btn-bg: #720026;
+  --btn-bg-hover: #b81a4f;
+  --btn-bg-active: #aa00ff;
+  --btn-alt: #44001a;
+
+  --card-bg: #1a0a3d;
+  --highlight: #ff00ff;
+}
+/* ======================== */
+/*      ESTILO GERAL       */
+/* ======================== */
+
 body {
   margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
   height: 100vh;
   overflow: hidden;
+  background-color: var(--bg-main);
+  color: var(--text-color);
 }
 
 /* Topbar estilo programa */
 .topbar {
-  background-color: #2c2f33;
-  color: white;
+  background-color: var(--bg-panel);
+  color: var(--text-color);
   display: flex;
   align-items: center;
   height: 25px;
   padding: 0 10px;
   font-size: 10px;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid var(--border-color);
   position: relative;
   z-index: 10;
 }
@@ -27,14 +111,14 @@ body {
 .menu-button {
   background: none;
   border: none;
-  color: white;
+  color: var(--text-color);
   font-size: 14px;
   cursor: pointer;
   padding: 5px 10px;
 }
 
 .menu-button:hover {
-  background-color: #444;
+  background-color: var(--bg-hover);
 }
 
 .dropdown {
@@ -42,8 +126,8 @@ body {
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: #2c2f33;
-  border: 1px solid #444;
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
   min-width: 120px;
   z-index: 100;
 }
@@ -51,29 +135,28 @@ body {
 .dropdown a {
   display: block;
   padding: 8px 12px;
-  color: white;
+  color: var(--text-color);
   text-decoration: none;
 }
 
 .dropdown a:hover {
-  background-color: #444;
+  background-color: var(--bg-hover);
 }
 
 .menu:hover .dropdown {
   display: block;
 }
 
-/* Container principal: barra lateral + conteúdo */
+/* Layout principal */
 .container-principal {
   display: flex;
-  height: calc(100vh - 35px); /* altura total - topbar */
+  height: calc(100vh - 35px);
   overflow: hidden;
 }
 
-/* Barra de ícones estilo VS Code */
 .icon-bar {
   width: 40px;
-  background-color: #1e1e1e;
+  background-color: var(--bg-sidebar-alt);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -82,7 +165,7 @@ body {
 .icon-button {
   background: none;
   border: none;
-  color: white;
+  color: var(--text-color);
   font-size: 18px;
   padding: 10px;
   cursor: pointer;
@@ -90,18 +173,17 @@ body {
 }
 
 .icon-button:hover {
-  background-color: #333;
+  background-color: var(--btn-bg-hover);
 }
 
 .icon-button.active {
-  background-color: #4c5053;
+  background-color: var(--btn-bg-active);
 }
 
-/* Sidebar */
 .sidebar {
   width: 250px;
-  background-color: #343a40;
-  color: white;
+  background-color: var(--bg-sidebar);
+  color: var(--text-color);
   padding: 10px;
   transition: width 0.3s ease;
   overflow-x: hidden;
@@ -110,7 +192,6 @@ body {
   flex-direction: column;
 }
 
-/* Sidebar recolhida (esconde conteúdo, mas mantém barra de ícones fora) */
 .sidebar.collapsed {
   width: 40px;
   overflow: hidden;
@@ -120,8 +201,6 @@ body {
   display: none !important;
 }
 
-
-/* Painéis da sidebar */
 .sidebar-content {
   display: none;
   transition: opacity 0.2s ease;
@@ -131,7 +210,6 @@ body {
   display: block;
 }
 
-/* Títulos e listas da sidebar */
 .sidebar h3 {
   margin-top: 0;
 }
@@ -144,15 +222,15 @@ body {
 
 .sidebar ul li {
   padding: 8px;
-  border-bottom: 1px solid #495057;
+  border-bottom: 1px solid var(--border-color-light);
   cursor: pointer;
   overflow: hidden;
 }
 
 .sidebar button {
-  background-color: #495057;
+  background-color: var(--btn-bg);
   border: none;
-  color: white;
+  color: var(--text-color);
   padding: 8px 12px;
   cursor: pointer;
   border-radius: 5px;
@@ -160,80 +238,50 @@ body {
   margin-bottom: 15px;
 }
 
-.sidebar input, select, textarea {
+.sidebar input,
+select,
+textarea {
   cursor: pointer;
   border-radius: 5px;
   width: 100%;
 }
 
-/* Coluna direita */
+/* Conteúdo principal */
 .right-side {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  flex-grow: 1;
+  min-width: 0;
 }
 
-/* Conteúdo principal */
 .main-content {
   flex: 1;
   overflow: auto;
   padding: 0px;
-  background: #000000;
+  background: var(--bg-main);
 }
 
-/* Resizer */
 .resizer {
   height: 6px;
   cursor: row-resize;
-  background: #666;
+  background: var(--border-color);
 }
 
 /* Terminal */
-.bottom-panel {
-  height: 200px;
-  min-height: 50px;
-  max-height: 80vh;
-  overflow: auto;
-  background: #111;
-  color: white;
-  font-family: monospace;
-  border-top: 2px solid #444;
-  padding: 10px;
-}
-
-/* Item selecionado na lista de arquivos */
-.arquivo-item.ativo {
-  background-color: white;
-  color: #495057;
-  font-weight: bold;
-  border-radius: 5px;
-}
-
-/* Centralizar grafo */
-.grafo-container {
-  display: flex;
-  justify-content: center;
-}
-
-/* Textarea SQL */
-#sqlTextBox {
-  resize: vertical;
-}
-
-
+.bottom-panel,
 #bottomPanel {
-  position: relative;
-  background-color: #111;
-  color: white;
+  background-color: var(--bg-secondary);
+  color: var(--text-color);
+  font-family: monospace;
+  border-top: 2px solid var(--border-color);
   padding: 10px;
   height: 200px;
   overflow-y: auto;
-  font-family: monospace;
 }
 
 #bottomPanel h3 {
   margin: 0;
-  padding-right: 40px; /* espaço para o botão */
+  padding-right: 40px;
   position: relative;
 }
 
@@ -241,9 +289,9 @@ body {
   position: absolute;
   top: 5px;
   right: 10px;
-  background: #444;
-  border: 1px solid #888;
-  color: white;
+  background: var(--btn-alt);
+  border: 1px solid var(--border-color-light);
+  color: var(--text-color);
   cursor: pointer;
   font-size: 18px;
   padding: 2px 6px;
@@ -251,7 +299,73 @@ body {
   z-index: 10;
 }
 
+.arquivo-item.ativo {
+  background-color: var(--text-color);
+  color: var(--text-invert);
+  font-weight: bold;
+  border-radius: 5px;
+}
 
+.grafo-container {
+  display: flex;
+  justify-content: center;
+}
+
+#sqlTextBox {
+  resize: vertical;
+}
+
+#modo-toggle {
+  display: flex;
+  justify-content: left;
+  background-color: var(--bg-panel);
+  padding: 5px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#modo-toggle button {
+  height: 20px; /* ou ajusta pra altura desejada */
+  background-color: var(--btn-bg);
+  color: var(--text-color);
+  border: none;
+  padding: 0 20px; /* remova o padding vertical para evitar conflito */
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  display: flex;
+  align-items: center;   /* centraliza verticalmente */
+  justify-content: center; /* centraliza horizontalmente */
+}
+
+
+
+#modo-toggle button:hover {
+  background-color: var(--btn-bg-hover);
+  box-shadow: #ffffffee 0px 0px 5px;
+}
+
+#modo-toggle button.active {
+  background-color: #c5c5c5;
+  color: #111;
+}
+
+#mapa-container {
+  display: block;
+}
+
+#terminal-output {
+  background-color: var(--bg-secondary);
+  color: var(--highlight);
+  padding: 10px;
+  font-family: monospace;
+  height: 150px;
+  overflow-y: auto;
+  border-top: 1px solid var(--border-color);
+}
+
+/* FAQ */
 .faq-categoria {
   margin-bottom: 1.5em;
 }
@@ -263,9 +377,10 @@ body {
 .faq-question {
   width: 100%;
   text-align: left;
-  background: #343a40;
-  color: white;
+  background: var(--bg-sidebar);
+  color: var(--text-color);
   border: none;
+  margin-bottom: 0px;
   padding: 10px 15px;
   font-size: 13px;
   cursor: pointer;
@@ -274,23 +389,80 @@ body {
 }
 
 .faq-question:hover {
-  background: #a1a1a1;
+  background: var(--bg-hover);
 }
 
 .faq-answer {
   max-height: 0;
   overflow: hidden;
-  background: #212529;
+  background: var(--bg-faq);
   padding: 0 15px;
-  border-left: 4px solid white;
-  color: #e9ecef;
+  border-left: 4px solid var(--text-color);
+  border-top: 0px;
+  color: var(--text-muted);
   font-size: 0.9em;
   border-radius: 0 5px 5px 5px;
   transition: max-height 0.2s ease, padding 0.2s ease;
 }
 
-/* Quando ativo, aumenta o max-height e adiciona padding vertical */
 .faq-answer.active {
   padding: 10px 15px;
-  max-height: 500px; /* valor alto o suficiente para mostrar todo conteúdo */
+  max-height: 500px;
+}
+
+#stats-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.chart-container {
+  width: 100%;
+  height: 400px;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.time-filters {
+  margin-bottom: 15px;
+}
+
+.time-btn {
+  margin-right: 8px;
+  padding: 6px 12px;
+  border: none;
+  background-color: #ddd;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.time-btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.card {
+  background: var(--card-bg);
+  color: var(--text-color);
+  width: 50%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+}
+
+/* Submenu estilo cascata */
+.dropdown .menu {
+  position: relative;
+}
+
+.dropdown .menu .dropdown {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+}
+
+.dropdown .menu:hover .dropdown {
+  display: block;
 }

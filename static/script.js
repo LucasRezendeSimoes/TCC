@@ -143,9 +143,19 @@ async function carregarArquivos() {
         li.addEventListener("click", async () => {
           arquivoSelecionado = nome;
 
-          // Remover destaque de todos
           document.querySelectorAll(".arquivo-item").forEach(el => el.classList.remove("ativo"));
           li.classList.add("ativo");
+
+          const statsVisivel = document.getElementById("stats-container").style.display === "block";
+          if (statsVisivel) {
+            try {
+              await fetchDadosStats();
+              atualizarGraficos('1M');
+            } catch (err) {
+              console.error("Erro ao carregar estatísticas:", err);
+            }
+          }
+
 
           // Carregar conteúdo da base
           const formData = new FormData();
@@ -164,6 +174,8 @@ async function carregarArquivos() {
             bottomPanel.innerHTML = `<pre>Erro ao carregar base: ${err}</pre>`;
           }
         });
+
+
 
         lista.appendChild(li);
 
@@ -204,6 +216,49 @@ document.getElementById("csvInput").addEventListener("change", async function ()
     bottomPanel.innerHTML = `<pre>Erro ao enviar arquivo: ${err}</pre>`;
   }
 });
+
+
+//-----------------------------------------------------------
+// Alternar tema claro/escuro
+document.getElementById("tema-escuro").addEventListener("click", () => {
+  document.body.classList.remove("light-theme", "theme2077");
+  document.body.classList.add("dark-theme");
+});
+
+document.getElementById("tema-claro").addEventListener("click", () => {
+  document.body.classList.remove("dark-theme", "theme2077");
+  document.body.classList.add("light-theme");
+});
+
+document.getElementById("tema-cyberpunk").addEventListener("click", () => {
+  document.body.classList.remove("light-theme", "dark-theme");
+  document.body.classList.add("theme2077");
+});
+
+// Salvar e restaurar tema
+function aplicarTemaSalvo() {
+  const tema = localStorage.getItem("tema");
+  if (tema === "claro") {
+    document.body.classList.add("light-theme");
+  } else {
+    document.body.classList.add("dark-theme");
+  }
+}
+
+document.getElementById("tema-escuro").addEventListener("click", () => {
+  document.body.classList.remove("light-theme");
+  document.body.classList.add("dark-theme");
+  localStorage.setItem("tema", "escuro");
+});
+
+document.getElementById("tema-claro").addEventListener("click", () => {
+  document.body.classList.remove("dark-theme");
+  document.body.classList.add("light-theme");
+  localStorage.setItem("tema", "claro");
+});
+
+aplicarTemaSalvo(); // chama no início
+//-----------------------------------------------------------
 
 
 // Alternar painéis da barra lateral ao clicar nos ícones
@@ -274,8 +329,250 @@ document.querySelectorAll('.faq-question').forEach(button => {
 });
 
 
+//----------------------------------------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const btnMapa = document.getElementById("btnMapa");
+  const btnStats = document.getElementById("btnStats");
+  const mapa = document.getElementById("mapa-container");
+  const stats = document.getElementById("stats-container");
+  const totalDadosEl = document.getElementById('totalDados');
+  const totalTrajetosEl = document.getElementById('totalTrajetos'); // <--- novo elemento
+  const timeButtons = document.querySelectorAll('.time-btn');
+
+  let chartEstacoes, chartLinhas, chartRotas;
+  let dadosEstacoes = [];  // dados vindos do backend
+  let dadosLinhas = [];    // dados vindos do backend
+  let rotasOk = 0;
+  let rotasErros = 0;
+
+  // Quando clicar no botão "Estatísticas"
+  btnStats.addEventListener("click", () => {
+    mapa.style.display = "none";
+    stats.style.display = "block";
+    btnStats.classList.add("active");
+    btnMapa.classList.remove("active");
+    fetchDadosStats().then(() => {
+      // inicia com filtro padrão, por exemplo 1 mês
+      atualizarGraficos('1M');
+    }).catch(err => {
+      console.error("Erro ao buscar estatísticas:", err);
+    });
+  });
+
+  // Voltar para o mapa
+  btnMapa.addEventListener("click", () => {
+    mapa.style.display = "block";
+    stats.style.display = "none";
+    btnMapa.classList.add("active");
+    btnStats.classList.remove("active");
+  });
+
+  // Evento para cada botão de filtro de tempo
+  timeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      timeButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const periodo = btn.dataset.range;
+      atualizarGraficos(periodo);
+    });
+  });
+
+  // Função que busca os dados reais do backend
+  async function fetchDadosStats() {
+    if (!arquivoSelecionado) {
+      console.warn("Nenhuma base de dados selecionada para estatísticas.");
+      return;
+    }
+
+    const url = `/stats?arquivo=${encodeURIComponent(arquivoSelecionado)}`;
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      throw new Error(`HTTP error! status: ${resp.status}`);
+    }
+    const json = await resp.json();
+    if (json.erro) {
+      throw new Error(json.erro);
+    }
+
+    // Pega os dados
+    const nomeDB = json.nomeDB; // pega o nome da DB do backend
+    const total = json.total;
+    const total_trajetos = json.total_trajetos; // <--- pega total de trajetos do backend
+    const estacoes_por_dia = json.estacoes_por_dia; // array de { data, estacao, contagem }
+    const linhas_por_dia = json.linhas_por_dia;
+    rotasOk = json.rotas_ok;
+    rotasErros = json.rotas_erros;
+
+    // Atualiza elementos do cartão
+    const nomeDBEl = document.getElementById('nomeDB');
+    nomeDBEl.textContent = `DB: ${nomeDB}`;  // Atualiza o nome da DB
+    totalDadosEl.textContent = `Total de Dados: ${total.toLocaleString()}`;
+    totalTrajetosEl.textContent = `Total de Trajetos: ${total_trajetos.toLocaleString()}`;
+
+    // Processar para gráficos: por exemplo somar todas estações por dia
+    // Cria mapa data → soma de estações
+    const mapaDiaEstacoes = {};
+    estacoes_por_dia.forEach(item => {
+      const d = item.data;
+      if (!mapaDiaEstacoes[d]) mapaDiaEstacoes[d] = 0;
+      mapaDiaEstacoes[d] += item.contagem;
+    });
+    // Ordem das datas
+    const labelsEstacoes = Object.keys(mapaDiaEstacoes).sort();
+    const valoresEstacoes = labelsEstacoes.map(d => mapaDiaEstacoes[d]);
+
+    // Processar para linhas: separar cada linha, ou se quiser, somar
+    // Cria objecto: {
+    //   Azul: { data1: contagem, data2: contagem, ... },
+    //   Vermelha: { ... },
+    //   Verde: { ... }
+    // }
+    const objLinhas = {};
+    linhas_por_dia.forEach(item => {
+      const d = item.data;
+      const linha = item.linha;
+      const cont = item.contagem;
+      if (!objLinhas[linha]) objLinhas[linha] = {};
+      objLinhas[linha][d] = cont;
+    });
+    // Descobrir todas as datas que aparecem
+    const todasDatasLinhas = Array.from(
+      new Set(linhas_por_dia.map(item => item.data))
+    ).sort();
+    // Para cada linha, criar array de valores no mesmo order das datas
+    const linhasNomes = Object.keys(objLinhas);
+    const dadosPorLinha = {};
+    linhasNomes.forEach(l => {
+      dadosPorLinha[l] = todasDatasLinhas.map(d => objLinhas[l][d] || 0);
+    });
+
+    // Guardar em variáveis globais para usar no atualizarGrafico
+    dadosEstacoes = {
+      labels: labelsEstacoes,
+      valores: valoresEstacoes
+    };
+    dadosLinhas = {
+      labels: todasDatasLinhas,
+      dados: dadosPorLinha
+    };
+
+    console.log("Estatísticas atualizadas:", dadosEstacoes, dadosLinhas);
+  }
+
+  // Função que atualiza/gera os gráficos com os dados reais
+  function atualizarGraficos(periodo) {
+    if (!dadosEstacoes.labels || dadosEstacoes.labels.length === 0) {
+      // ainda não carregou os dados
+      return;
+    }
+
+    // gerar labels no período escolhido
+    const labelsPeriodo = filtrarLabels(dadosEstacoes.labels, periodo);
+    const valoresPeriodoEstacoes = filtrarValores(dadosEstacoes.labels, dadosEstacoes.valores, periodo, labelsPeriodo);
+
+    // Estações
+    if (chartEstacoes) chartEstacoes.destroy();
+    const ctxE = document.getElementById('graficoEstacoes').getContext('2d');
+    chartEstacoes = new Chart(ctxE, {
+      type: 'line',
+      data: {
+        labels: labelsPeriodo,
+        datasets: [{
+          label: 'Uso de estações por dia',
+          data: valoresPeriodoEstacoes,
+          borderColor: '#007bff',
+          backgroundColor: 'rgba(0,123,255,0.2)',
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    // Linhas
+    const labelsLinhasPeriodo = filtrarLabels(dadosLinhas.labels, periodo);
+    if (chartLinhas) chartLinhas.destroy();
+    const ctxL = document.getElementById('graficoLinhas').getContext('2d');
+    const datasetsLinhas = Object.keys(dadosLinhas.dados).map(linha => {
+      return {
+        label: `Linha ${linha}`,
+        data: filtrarValores(dadosLinhas.labels, dadosLinhas.dados[linha], periodo, labelsLinhasPeriodo),
+        borderColor: escolherCorLinha(linha),
+        fill: false,
+        tension: 0.3
+      };
+    });
+    chartLinhas = new Chart(ctxL, {
+      type: 'line',
+      data: {
+        labels: labelsLinhasPeriodo,
+        datasets: datasetsLinhas
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    // Pizza rotas
+    if (chartRotas) chartRotas.destroy();
+    const ctxR = document.getElementById('graficoRotas').getContext('2d');
+    chartRotas = new Chart(ctxR, {
+      type: 'pie',
+      data: {
+        labels: ['Rotas OK', 'Rotas com Erros'],
+        datasets: [{
+          data: [rotasOk, rotasErros],
+          backgroundColor: ['#28a745', '#dc3545']
+        }]
+      },
+      options: { responsive: true }
+    });
+  }
+
+  // Auxiliares: filtrar labels & valores baseado no período
+  function filtrarLabels(labelsAll, periodo) {
+    const today = new Date();
+    if (periodo === '1D') {
+      return labelsAll.slice(-1);
+    } else if (periodo === '7D') {
+      return labelsAll.slice(-7);
+    } else if (periodo === '1M') {
+      return labelsAll.slice(-30);
+    } else if (periodo === '1Y') {
+      return labelsAll.slice(-365).filter((v,i) => {
+        const dt = new Date(v);
+        return dt.getDate() === 1;
+      });
+    } else { // MAX
+      return labelsAll;
+    }
+  }
+
+  function filtrarValores(labelsAll, valoresAll, periodo, labelsPeriodo) {
+    const idxMap = {};
+    labelsAll.forEach((lab, idx) => idxMap[lab] = idx);
+    return labelsPeriodo.map(lab => {
+      const idx = idxMap[lab];
+      return idx !== undefined ? valoresAll[idx] : 0;
+    });
+  }
+
+  // Escolher cor dependendo do nome da linha
+  function escolherCorLinha(linhaNome) {
+    const nm = linhaNome.toLowerCase();
+    if (nm.includes('azul')) return '#007bff';
+    if (nm.includes('vermelha')) return '#dc3545';
+    if (nm.includes('verde')) return '#28a745';
+    return '#6c757d';
+  }
+});
 
 
+//----------------------------------------------------------------------------------------------------
  // Exportar conteúdo do log
 document.getElementById('saveBtn').addEventListener('click', function(e) {
   e.preventDefault();

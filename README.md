@@ -52,8 +52,6 @@
 
 # Implementações:
 ## Implementações para fazer:
-- Gráficos
-- Atualizar .scv de banco de dados remoto
 
 ## Implementações feitas:
 - Função que gera dados para testes
@@ -75,14 +73,17 @@
 - Destacar fluxo pesquisado no mapa
 - Detectar discrepancias (Primeiro vertice deve ser de entrada, últimop vertice deve ser de saída e fluxo contínuo)
 - Procurar e destacar no mapa vertices e erastas hipotéticos e destacar no mapa
-- Salvar discrepâncias num relatório automaticamente  
+- Salvar discrepâncias num relatório automaticamente
+- Gráficos
+- Atualizar .scv de banco de dados remoto
 
 # Dependencias
-* 'python -m pip install duckdb flask pandas pyvis'
+* 'python -m pip install duckdb flask pandas pyvis pymongo'
 - duckdb - Banco de dados em memória super rápido, usado para executar consultas SQL diretamente nos arquivos CSV
 - flask - Framework web em Python, responsável pela comunicação entre o backend em Python e o frontend HTML
 - pandas - Biblioteca para manipulação e análise de dados, usada pra transformar os resultados SQL em tabelas bem formatadas
 - pyvis - Biblioteca de visualização de grafos, usada para gerar mapas interativos das câmeras e trajetos
+- pymongo - Integração com banco de dados remoto MongoDB
 
 # Executar:
 1. Inatale as dependêencias
