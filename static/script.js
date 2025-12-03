@@ -219,7 +219,7 @@ document.getElementById("csvInput").addEventListener("change", async function ()
 
 
 //-----------------------------------------------------------
-// Alternar tema claro/escuro
+// Alternar temas
 document.getElementById("tema-escuro").addEventListener("click", () => {
   document.body.classList.remove("light-theme", "theme2077");
   document.body.classList.add("dark-theme");
@@ -286,32 +286,111 @@ document.querySelectorAll('.icon-button').forEach(button => {
       });
   });
 
-
-
-  // Carregar lista de relatorios
-  async function carregarRelatorios() {
+ //-------------------------------------------------------------------------------
+// --------------------- Carregar lista de relatórios e conteúdo ao clicar
+async function carregarRelatorios() {
   try {
     const res = await fetch("/api/relatorios");
     const data = await res.json();
 
-    const lista = document.getElementById("lista-relatorios");
-    lista.innerHTML = "";
+    if (data.relatorios) {
+      const lista = document.getElementById("relatorios-lista");
+      lista.innerHTML = ""; // limpa antes
 
-    if (data.relatorios.length === 0) {
-      lista.innerHTML = "<p>Ainda não há relatórios.</p>";
-      return;
+      data.relatorios.forEach((nome, index) => {
+        const li = document.createElement("li");
+        li.textContent = nome;
+        li.classList.add("relatorio-item");
+
+        li.addEventListener("click", async () => {
+          relatorioSelecionado = nome;
+
+          // Destacar item clicado
+          document.querySelectorAll(".relatorio-item").forEach(el => el.classList.remove("ativo"));
+          li.classList.add("ativo");
+
+          try {
+            const res = await fetch("/visualizar_relatorio_terminal", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ nome })
+            });
+
+            const json = await res.json();
+
+            if (json.conteudo) {
+              bottomPanel.innerHTML = `<pre>${json.conteudo.join('\n')}</pre>`;
+            } else {
+              bottomPanel.innerHTML = `<pre>${json.result}</pre>`;
+            }
+
+          } catch (err) {
+            bottomPanel.innerHTML = `<pre>Erro ao carregar relatório: ${err}</pre>`;
+          }
+        });
+
+        lista.appendChild(li);
+
+        // Seleciona o primeiro relatório automaticamente
+        if (index === 0) {
+          li.click();
+        }
+      });
+    } else {
+      console.error("Erro ao carregar relatórios:", data.erro);
     }
-
-    data.relatorios.forEach(nome => {
-      const li = document.createElement("li");
-      li.textContent = nome;
-      lista.appendChild(li);
-    });
-
   } catch (err) {
     console.error("Erro ao buscar relatórios:", err);
   }
-}document.querySelector('[data-target="painel-relatorios"]').addEventListener("click", carregarRelatorios);
+}
+
+
+//-------------------------------------------------------------------------------
+// Função para visualizar relatório no terminal da UI (bottomPanel) e disparar print no servidor
+async function visualizarRelatorio(nomeArquivo) {
+  const confirmar = confirm(`Deseja visualizar o relatório "${nomeArquivo}"?`);
+  if (!confirmar) return;
+
+  try {
+    const res = await fetch("/visualizar_relatorio_terminal", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ nome: nomeArquivo })
+    });
+
+    const data = await res.json();
+
+    // Exibir no painel inferior
+    const bottomPanel = document.getElementById("bottomPanel");
+    if (data.conteudo) {
+      // Mostrar as linhas do relatório como pre formatado
+      bottomPanel.innerHTML = `<pre>${data.conteudo.join('\n')}</pre>`;
+    } else {
+      bottomPanel.innerHTML = `<pre>${data.result}</pre>`;
+    }
+
+  } catch (err) {
+    const bottomPanel = document.getElementById("bottomPanel");
+    bottomPanel.innerHTML = `<pre>Erro ao buscar relatório: ${err}</pre>`;
+  }
+}
+
+// Adicionar event listeners para os botões dos relatórios quando a página/carregamento de relatorios ocorrer
+document.addEventListener("DOMContentLoaded", () => {
+  // Verifica se o painel de relatórios existe
+  const relItens = document.querySelectorAll('.relatorio-item');
+  relItens.forEach(button => {
+    button.addEventListener('click', () => {
+      const nome = button.getAttribute('data-rel');
+      visualizarRelatorio(nome);
+    });
+  });
+});
+//-------------------------------------------------------------------------------
 
 
 // Mostrar resposta de pergunta em "Perguntas frequentes"
@@ -400,6 +479,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const total_trajetos = json.total_trajetos; // <--- pega total de trajetos do backend
     const estacoes_por_dia = json.estacoes_por_dia; // array de { data, estacao, contagem }
     const linhas_por_dia = json.linhas_por_dia;
+    window.dadosLinhasRaw = linhas_por_dia;
     rotasOk = json.rotas_ok;
     rotasErros = json.rotas_erros;
 
@@ -492,30 +572,53 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Linhas
-    const labelsLinhasPeriodo = filtrarLabels(dadosLinhas.labels, periodo);
+    // Gráfico de baarras por total de registros de cada linha
     if (chartLinhas) chartLinhas.destroy();
     const ctxL = document.getElementById('graficoLinhas').getContext('2d');
-    const datasetsLinhas = Object.keys(dadosLinhas.dados).map(linha => {
-      return {
-        label: `Linha ${linha}`,
-        data: filtrarValores(dadosLinhas.labels, dadosLinhas.dados[linha], periodo, labelsLinhasPeriodo),
-        borderColor: escolherCorLinha(linha),
-        fill: false,
-        tension: 0.3
-      };
+
+    // Pegar os dados brutos das linhas do backend
+    const linhasBrutas = window.dadosLinhasRaw || [];
+    if (linhasBrutas.length === 0) return;
+
+    // Somar total de registros por linha
+    const totaisPorLinha = {};
+    linhasBrutas.forEach(item => {
+      const nomeLinha = item.linha || item.Linha || "Indefinida";
+      if (!totaisPorLinha[nomeLinha]) totaisPorLinha[nomeLinha] = 0;
+      totaisPorLinha[nomeLinha] += item.contagem;
     });
+
+    const labelsLinhas = Object.keys(totaisPorLinha);
+    const valoresLinhas = Object.values(totaisPorLinha);
+
     chartLinhas = new Chart(ctxL, {
-      type: 'line',
+      type: 'bar',
       data: {
-        labels: labelsLinhasPeriodo,
-        datasets: datasetsLinhas
+        labels: labelsLinhas,
+        datasets: [{
+          label: 'Total de registros por linha do Metrô',
+          data: valoresLinhas,
+          backgroundColor: labelsLinhas.map(l => escolherCorLinha(l))
+        }]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Registros' }
+          },
+          x: {
+            title: { display: true, text: 'Linhas do Metrô' }
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        }
       }
     });
+
 
     // Pizza rotas
     if (chartRotas) chartRotas.destroy();
@@ -535,21 +638,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Auxiliares: filtrar labels & valores baseado no período
   function filtrarLabels(labelsAll, periodo) {
-    const today = new Date();
-    if (periodo === '1D') {
-      return labelsAll.slice(-1);
-    } else if (periodo === '7D') {
-      return labelsAll.slice(-7);
-    } else if (periodo === '1M') {
-      return labelsAll.slice(-30);
-    } else if (periodo === '1Y') {
-      return labelsAll.slice(-365).filter((v,i) => {
-        const dt = new Date(v);
-        return dt.getDate() === 1;
-      });
-    } else { // MAX
       return labelsAll;
-    }
   }
 
   function filtrarValores(labelsAll, valoresAll, periodo, labelsPeriodo) {
@@ -568,6 +657,46 @@ document.addEventListener("DOMContentLoaded", () => {
     if (nm.includes('vermelha')) return '#dc3545';
     if (nm.includes('verde')) return '#28a745';
     return '#6c757d';
+  }
+});
+
+//----------------------------------------------------------------------------------------------------
+ // Exportar relatório
+document.getElementById("exportarRelatorioBtn").addEventListener("click", async function () {
+  if (!relatorioSelecionado) {
+    alert("Nenhum relatório selecionado.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/visualizar_relatorio_terminal", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ nome: relatorioSelecionado })
+    });
+
+    const data = await res.json();
+    if (!data.conteudo) {
+      alert("Conteúdo do relatório está vazio.");
+      return;
+    }
+
+    const conteudo = data.conteudo.join("\n");
+    const blob = new Blob([conteudo], { type: "text/plain;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = relatorioSelecionado;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+  } catch (err) {
+    alert("Erro ao exportar relatório: " + err);
   }
 });
 
@@ -638,3 +767,4 @@ document.getElementById('saveBtn').addEventListener('click', function(e) {
 
 // Carrega os arquivos ao iniciar
 carregarArquivos();
+carregarRelatorios();

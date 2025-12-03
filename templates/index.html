@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TCC</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="./imgs/Subweye_logo2.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -50,6 +51,7 @@
       <button class="icon-button active" data-target="painel-arquivos" title="Arquivos">📁</button>
       <button class="icon-button" data-target="painel-consultas" title="Consultas">🔍</button>
       <button class="icon-button" data-target="painel-relatorios" title="Relatórios">📊</button>
+      <button class="icon-button" data-target="painel-relatorios" title="Mapa Assets">🌐</button>
       <button class="icon-button" data-target="painel-duvidas" title="Dúvidas frequentes">❓</button>
       <button class="icon-button" data-target="painel-creditos" title="Créditos">🧑‍💻</button>
     </div>
@@ -117,18 +119,12 @@
         </form>
       </div>
 
+  
       <!-- Painel de Relatórios -->
       <div class="sidebar-content" id="painel-relatorios">
         <h3>Relatórios</h3>
-        <ul id="relatorios-lista">
-          {% if relatorios and relatorios|length > 0 %}
-            {% for rel in relatorios %}
-              <li>{{ rel }}</li>
-            {% endfor %}
-          {% else %}
-            <li><em>Ainda não há relatórios.</em></li>
-          {% endif %}
-        </ul>
+        <button id="exportarRelatorioBtn" class="exportar-btn">Exportar</button>
+        <ul id="relatorios-lista"></ul>
       </div>
 
 
@@ -145,27 +141,21 @@
             </div>
           </div>
 
-          <div class="faq-item">
-            <button class="faq-question">Como me referir à base selecionada nas queries SQL?</button>
-            <div class="faq-answer">
-              <p>Ao fazer queries SQL, indeependente do nome da base, sempre se refira à base selecionada pelo nome <code>dados</code>. Isso garante que a query opere na base correta atualmente selecionada</p>
-            </div>
-          </div>
         </div>
 
         <div class="faq-categoria">
           <h4>2. Queries SQL e análise de dados</h4>
           <div class="faq-item">
-            <button class="faq-question">Posso usar qualquer tabela nas queries?</button>
+            <button class="faq-question">Como me referir à base selecionada nas queries SQL?</button>
             <div class="faq-answer">
-              <p>Você deve usar as tabelas que existem na base selecionada. Normalmente as tabelas usadas são <code>cams</code> para câmeras, <code>grafo</code> para conexões, e tabelas de movimento para trajetos.</p>
+              <p>Ao fazer queries SQL, indeependente do nome da base, sempre se refira à base selecionada pelo nome <code>"dados"</code>. Isso garante que a query opere na base correta atualmente selecionada</p>
             </div>
           </div>
 
           <div class="faq-item">
             <button class="faq-question">Como faço para analisar discrepâncias nos trajetos dos das bases de dados?</button>
             <div class="faq-answer">
-              <p>O script <code>relatorio.py</code> automaticamente lê os dados de movimento e gera relatórios JSON com erros e buracos identificados usando o grafo de conexões. Os relatórios podem ser acessados na aba Relatórios</p>
+              <p>O script interno <code>relatorio.py</code> automaticamente lê os dados de movimento e gera relatórios JSON contemplando erros e buracos identificados usando o grafo de conexões. Os relatórios podem ser acessados na aba Relatórios</p>
             </div>
           </div>
         </div>
@@ -175,7 +165,7 @@
           <div class="faq-item">
             <button class="faq-question">Como visualizar os trajetos e conexões das câmeras?</button>
             <div class="faq-answer">
-              <p>O mapa das câmeras, junto com suas conexões e parâmetros são gerados sutomaticamente na guia a direita quando selecionado a aba Mapa. Pode-se visualizar uma câmera específica no mapa pesquisando pelo seu número ou visualizar o trajeto de uma hash, buscando na aba Pesquisa</p>
+              <p>O mapa das câmeras, junto com suas conexões e parâmetros são gerados automaticamente na guia a direita quando selecionado a aba Mapa. Pode-se visualizar uma câmera específica no mapa pesquisando pelo seu número ou visualizar o trajeto de uma hash, buscando na aba Pesquisa</p>
             </div>
           </div>
 
@@ -190,17 +180,34 @@
         <div class="faq-categoria">
           <h4>4. Importação e exportação de arquivos</h4>
           <div class="faq-item">
-            <button class="faq-question">Pergunta</button>
+            <button class="faq-question">Como exportar um arquivo csv derivado de um dos bancos de dados?</button>
             <div class="faq-answer">
-              <p>Resposta</p>
+              <p>Selecionando File > Save, será exportado no explorador de arquivos um arequivo .csv do conteúdo que estiver no terminal, seja o conteúdo completo da base de dados selecionada, ou apenas dados resultantes de uma pesquisa realizada</p>
             </div>
           </div>
         </div>
+
+        <div class="faq-item">
+            <button class="faq-question">Como importar Bases de dados locais?</button>
+            <div class="faq-answer">
+              <p>Selecionando File > Open, o explorador de arquivos será aberto e pode-se selecionar um arquivo .csv para ser adicionado na lista de Bases de dados</p>
+            </div>
+          </div>
+
+        <div class="faq-item">
+            <button class="faq-question">Como exportar os relatórios?</button>
+            <div class="faq-answer">
+              <p>Na aba Relatórios, selecione o arquivo desejado e depois pressione o botão "Exportar" que o arquivo em questão será adicionado ao explorador de arquivos.</p>
+            </div>
+          </div>
+
       </div>
 
       <!-- Painel de Créditos aos desenvolvedores -->
       <div class="sidebar-content" id="painel-creditos" style="padding: 15px; font-family: monospace; color: #fff;">
         <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">🎓 Créditos</h3>
+
+        <img src="./imgs/Subweye_logo1.png" alt="Imagem da página" width="200">
 
         <pre style="color: #00ffff; font-weight: bold; font-size: 11px;">
 .-.   .       .--      
@@ -238,14 +245,6 @@
       </div>
 
       <div class="main-content" id="stats-container" style="display: none; padding: 20px;">
-        <!-- Filtros de tempo -->
-        <div class="time-filters">
-          <button data-range="1D" class="time-btn active">1D</button>
-          <button data-range="7D" class="time-btn">1 Semana</button>
-          <button data-range="1M" class="time-btn">1 Mês</button>
-          <button data-range="1Y" class="time-btn">1 Ano</button>
-          <button data-range="MAX" class="time-btn">Máx</button>
-        </div>
 
         <!-- Cartão de total de dados -->
         <div id="dataSummary" class="card">

@@ -5,6 +5,9 @@ import pandas as pd
 from werkzeug.utils import secure_filename
 import json
 
+import mapa
+from Funcoes_auxiliares import funcoesMongo
+
 # Importações para a thread de relatórios
 import threading
 import time
@@ -22,10 +25,23 @@ con = duckdb.connect()
 # Carregar CSV em DuckDB
 def carregar_tabela(nome_arquivo):
     caminho = os.path.join("Dados", nome_arquivo)
-    con.execute(f"""
-        CREATE OR REPLACE TABLE dados AS 
-        SELECT * FROM read_csv_auto('{caminho}')
-    """)
+    try:
+        # Forçar leitura limpa do cabeçalho
+        df = pd.read_csv(caminho, encoding="utf-8-sig", sep=",", engine="python")
+        
+        # Renomear colunas removendo espaços ou caracteres invisíveis
+        df.columns = [c.strip() for c in df.columns]
+
+        # Substituir tabela no DuckDB
+        con.unregister("dados") if "dados" in [t[0] for t in con.execute("SHOW TABLES").fetchall()] else None
+        con.register("dados", df)
+        print(f"[carregar_tabela] Colunas carregadas: {df.columns.tolist()}")
+        
+    except Exception as e:
+        print(f"[ERRO] Falha ao carregar tabela {nome_arquivo}: {e}")
+        raise
+
+
 
 #---------------------------------------------------------------------
 # Thread para gerar relatórios em segundo plano
@@ -35,15 +51,26 @@ def loop_relatorios():
         time.sleep(60)
 
 threading.Thread(target=loop_relatorios, daemon=True).start()
-
 RELATORIOS_DIR = "Relatorios"
 
+'''
 @app.route('/relatorios')
 def relatorios():
     # lista os arquivos na pasta Relatorios
     arquivos = [f for f in os.listdir(RELATORIOS_DIR) if f.endswith(".jsonl")]
     return render_template("relatorios.html", arquivos=arquivos)
+'''
+@app.route("/relatorios")
+def lista_relatorios():
+    pasta = "Relatorios"
+    try:
+        arquivos = os.listdir(pasta)
+        arquivos = [f for f in arquivos if os.path.isfile(os.path.join(pasta, f))]
+        return jsonify({"arquivos": arquivos})
+    except Exception as e:
+        return jsonify({"erro": str(e)})
 
+@app.route("/relatorios")
 def listar_relatorios():
     caminho = "Relatorios"
     if not os.path.exists(caminho):
@@ -53,16 +80,13 @@ def listar_relatorios():
 
 @app.route("/api/relatorios")
 def api_relatorios():
-    arquivos = [f for f in os.listdir(RELATORIOS_DIR) if f.endswith(".jsonl")]
+    arquivos = listar_relatorios()
     return jsonify({"relatorios": arquivos})
-
 
 def listar_arquivos_soa():
     caminho = "SOA"
     arquivos = [f for f in os.listdir(caminho) if f.endswith(".csv")]
     return arquivos
-
-
 
 #---------------------------------------------------------------------
 @app.route("/carregar_base", methods=["POST"])
@@ -103,6 +127,38 @@ def query():
         return jsonify({"result": f"Erro na consulta: {e}"})
 
 #---------------------------------------------------------------------
+@app.route("/visualizar_relatorio_terminal", methods=["POST"])
+def visualizar_relatorio_terminal():
+    data = request.get_json()
+    nome = data.get("nome")
+    
+    if not nome:
+        return jsonify({"result": "Nome do relatório não fornecido."}), 400
+
+    caminho = os.path.join(RELATORIOS_DIR, nome)
+    
+    if not os.path.exists(caminho):
+        return jsonify({"result": f"Arquivo '{nome}' não encontrado."}), 404
+
+    print(f"\n\n==== Visualizando relatório: {nome} ====")
+    conteudo = []
+    try:
+        with open(caminho, encoding="utf-8") as f:
+            for linha in f:
+                linha = linha.strip()
+                print(linha)
+                conteudo.append(linha)
+    except Exception as e:
+        return jsonify({"result": f"Erro ao ler relatório: {e}"}), 500
+
+    print("==== Fim do relatório ====\n\n")
+    return jsonify({
+        "result": f"Relatório '{nome}' impresso no terminal com sucesso.",
+        "conteudo": conteudo
+    })
+
+
+#---------------------------------------------------------------------
 # Envia dados para criar estatísticas
 @app.route("/stats", methods=["GET"])
 def stats():
@@ -130,7 +186,7 @@ def stats():
 
     # caminho para ler cams.csv
     try:
-        cams = pd.read_csv("Dados/cams.csv")
+        cams = pd.read_csv("cam_assets/cams.csv")
         print(f"[stats] cams.csv lido, colunas: {cams.columns.tolist()}")
     except Exception as e:
         print("[stats] Erro ao ler cams.csv:", e)
@@ -267,7 +323,7 @@ def auto_query():
     cameras_filtradas = None
     if linha or estacao:
         try:
-            cams_path = Path("Dados") / "cams.csv"
+            cams_path = Path("cam_assets") / "cams.csv"
             cams_df = pd.read_csv(cams_path)
 
             filtro = pd.Series([True] * len(cams_df))
@@ -385,7 +441,13 @@ def upload_csv():
         return jsonify({"result": f"Erro ao salvar arquivo: {e}"})
 
 #---------------------------------------------------------------------
+#reseta dados de db do mongo
+funcoesMongo.apagar_todos_documentos()
 if __name__ == "__main__":
+    # Inicia arquivos necessários
+    #mapa.gerar_grafo()
+    
+
     # Inicia as threads de input/output Mongo
     InputMongo(num_hashes=20, intervalo=5, lote_tamanho=10).start()
     OutputMongo(caminho_csv="Dados/mov_mongo_2025.csv", intervalo=10).start()

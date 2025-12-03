@@ -466,3 +466,16 @@ textarea {
 .dropdown .menu:hover .dropdown {
   display: block;
 }
+
+.exportar-btn {
+  margin: 10px 0;
+  padding: 5px 10px;
+  background-color: var(--btn-bg);
+  color: var(--text-color);
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.exportar-btn:hover {
+  background-color: var(--btn-bg-hover);
+}

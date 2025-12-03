@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 import sys
 
+# Definição dos dados de acesso do banco remoto
 user = "Subweye"
 password = "Nando-18"
 cluster_url = "cluster0.alkn6hg.mongodb.net"
@@ -16,7 +17,7 @@ try:
     client.list_database_names()
     print("✅ Conexão com MongoDB Atlas bem-sucedida!")
 except ServerSelectionTimeoutError as err:
-    print("❌ Erro ao conectar no MongoDB Atlas:")
+    print("Erro ao conectar no MongoDB Atlas:")
     print(err)
     sys.exit(1)
 

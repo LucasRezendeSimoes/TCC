@@ -44,8 +44,7 @@ class OutputMongo(threading.Thread):
                             f"\"{doc['posicao_inicial']}\","
                             f"\"{doc['posicao_final']}\","
                             f"{doc['id_imagem']},"
-                            f"{doc['numero_camera']},"
-                            f"{doc['_id']}\n"
+                            f"{doc['numero_camera']}\n"
                         )
                         f.write(linha)
                         self.ultimos_ids.add(doc['_id'])

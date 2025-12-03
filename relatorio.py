@@ -6,8 +6,8 @@ from datetime import datetime
 
 DADOS_DIR = "Dados"
 RELATORIOS_DIR = "Relatorios"
-CAMERAS_CSV = os.path.join(DADOS_DIR, "cams.csv")
-GRAFO_CSV = os.path.join(DADOS_DIR, "grafo.csv")
+CAMERAS_CSV = os.path.join("cam_assets", "cams.csv")
+GRAFO_CSV = os.path.join("cam_assets", "grafo.csv")
 PROCESSED_LOG = os.path.join(RELATORIOS_DIR, "bases_processadas.txt")
 
 os.makedirs(RELATORIOS_DIR, exist_ok=True)

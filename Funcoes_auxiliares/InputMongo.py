@@ -5,7 +5,7 @@ from Funcoes_auxiliares.Conexao import colecao
 from Funcoes_auxiliares.geraDadosMongo import gerar_movimentacao_realista
 
 class InputMongo(threading.Thread):
-    def __init__(self, num_hashes=10, intervalo=5, lote_tamanho=20):
+    def __init__(self, num_hashes=10, intervalo=5, lote_tamanho=1):
         super().__init__(daemon=True)
         self.num_hashes = num_hashes
         self.intervalo = intervalo
@@ -25,7 +25,7 @@ class InputMongo(threading.Thread):
 
                 try:
                     colecao.insert_many(documentos)
-                    print(f"📤 Inserido {len(documentos)} registros (de {posicao} a {fim - 1})")
+                    print(f"Inserido {len(documentos)} registros (de {posicao} a {fim -1})")
                 except Exception as e:
                     print("❌ Erro ao inserir no MongoDB:", e)
 

@@ -1,0 +1,21 @@
+Número da camera,Estação,Linha,Tipo,Imagem default
+1,Liberdade,Azul,entrada,imagens/default/cam001.jpg
+2,Liberdade,Azul,entrada,imagens/default/cam002.jpg
+3,Liberdade,Azul,trajeto,imagens/default/cam003.jpg
+4,Sé,Vermelha,entrada,imagens/default/cam004.jpg
+5,Sé,Vermelha,trajeto,imagens/default/cam005.jpg
+6,Sé,Vermelha,saída,imagens/default/cam006.jpg
+7,Consolação,Verde,entrada,imagens/default/cam007.jpg
+8,Consolação,Verde,saída,imagens/default/cam008.jpg
+9,Consolação,Verde,saída,imagens/default/cam009.jpg
+10,Jabaquara,Azul,entrada,imagens/default/cam010.jpg
+11,Jabaquara,Azul,trajeto,imagens/default/cam011.jpg
+12,Jabaquara,Azul,saída,imagens/default/cam012.jpg
+13,Vila Madalena,Verde,entrada,imagens/default/cam013.jpg
+14,Vila Madalena,Verde,trajeto,imagens/default/cam014.jpg
+15,Vila Madalena,Verde,saída,imagens/default/cam015.jpg
+16,Luz,Amarela,entrada,imagens/default/cam016.jpg
+17,Luz,Amarela,trajeto,imagens/default/cam017.jpg
+18,Luz,Amarela,saída,imagens/default/cam018.jpg
+19,Santa Cruz,Lilás,entrada,imagens/default/cam019.jpg
+20,Santa Cruz,Lilás,trajeto,imagens/default/cam020.jpg

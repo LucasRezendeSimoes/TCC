@@ -1,4 +1,7 @@
-# TCC
+# TCC SUBWEYE
+
+# Sobre o software:
+O software desenvolvido realiza o processamento, análise, visualização e permite o fácil manuseio de dados provenientes de câmeras distribuídas em uma malha metroviária. Ele permite a ingestão de arquivos CSV, integração com MongoDB, validação de dados, geração de relatórios, reconstrução de trajetos e exibição interativa do grafo de câmeras em um mapa HTML. Além disso, oferece ferramentas de testes de desempenho, módulos auxiliares para manipulação de dados e uma interface web responsiva para consulta e exploração dos resultados.
 
 # Desenvolvedores:
 - Fernando Milani Venerando (RA: 24.122.063-1)
@@ -6,92 +9,101 @@
 
 '8° semestre Ciências da Computação FEI - 2025'
 
-# Brainstorm:
-- Lod Câmera/Estação
-- Mostrar tabela Inteira com query destacada/ Mostrar apenas query
-- Pesquisa por linha e estação
-- Informações contidas em cada câmera:
-  - Número da camera
-  - Estação e linha
-  - Câmeras conectadas no grafo/mapa
-  - Camera de entrada/trajeto/saída
-  - Imagem default
-- Destaque do mapa:
-  - Desque de rota:
-    1. Query de hash
-    2. Verifica todas as aparições da hash
-    3. Lista câmeras de aparição e ordena por tempo inicial
-    4. Compara ordem com conexções do grafo no mapa
-      - Se estiver OK:
-        1. destaque no mapa os vertices correspondentes e as conexões entre eles
-      - Se não foi detectado entrando:
-        1. Se o primeiro registro da hash não foi de uma câmera de entrada, detectar câmera de entrada mais próxima de primeiro registro
-        2. Destacar no mapa vertices e conexões entre eles percorridos
-        3. destacar (de forma diferente) trajeto e vertice mais provavel entre camera de entrada mais próxima e camera de primeiro registro
-        4. Enviar para relatório de discrepancias
-      - Se tem buracos no meio do trajeto:
-        1. Se em meio ao trajeto da hash estiver faltando uma ou mais , detectar trajeto mais curto entre buracos
-        2. Destacar no mapa vertices e conexões entre eles percorridos
-        3. destacar (de forma diferente) trajeto e vertice mais provavel entre buracos
-        4. Enviar para relatório de discrepancias
-      - Se não foi detectado saindo:
-        1. Se o último registro da hash não foi de uma câmera de saída, detectar câmera de saída mais próxima de último registro
-        2. Destacar no mapa vertices e conexões entre eles percorridos
-        3. destacar (de forma diferente) trajeto e vertice mais provavel entre camera de saída mais próxima e camera de último registro
-        4. Enviar para relatório de discrepancias
-  - Destaque de camera:
-    1. Query de camera
-    2. Destacar camera no mapa
-  - Destaque de estacao:
-    1. Query de estacao
-    2. Destacar todas os vertices e arestas da estacao correspondente
-  - Destqeue de Linha:
-    1. Query de linha
-    2. Destacar todos os vertices e arestas da linha correspondente (Destacar da cor correspondentte da linha)
+# Estrutura do projeto:
+## Árvore de diretórios:
+/
+├── app.py
+├── mapa.py
+├── relatorio.py
+├── cam_assets/
+│   ├── cams.csv
+│   ├── grafo.csv
+│   └── positions.csv
+├── Dados/
+│   └── mov_mongo_2025.csv
+├── Funcoes_auxiliares/
+│   ├── Conexao.py
+│   ├── funcoesMongo.py
+│   ├── geraDadosMongo.py
+│   ├── InputMongo.py
+│   └── OutputMongo.py
+├── metodosValidacao/
+│   ├── analise_desempenho.py
+│   ├── test_desempenho.py
+│   └── Resultados_testes_desempenho.csv
+├── Relatorios/
+├── SOA/
+├── static/
+│   ├── styles.css
+│   └── script.js
+└── templates/
+    └── index.html
 
+- ## app.py
+Arquivo principal da aplicação. Responsável por inicializar o sistema, configurar rotas e integrar os módulos auxiliares.
 
-# Implementações:
-## Implementações para fazer:
-### Pequenas mudanças pendentes:
-- Destacar BD e relatório vinculado ao mongo na lista de DBs
-- Preencher buracos de trajeto corretamente
-- Permitir AutoQuery de mais de um valor (Ex: "aaaaaaaa, bbbbbbbb")
-- Revisar Dúvidas frequentes
-- Adicionar hiperlinks de navegação na aba de dúvidas
-- Vincular OutputMongo xom atualizações de relatórios
-- Mudar grafo.csv e cams.csv da pasta Dados para a pasta Assets(Exemplo)
-- Adicionar arquivo que define posição X,Y de vértices no grafo
-- Permitir alteração de arquivos da pasta Assets
-- Ao alterar arquivos da pasta Assets, revisar e reescrever relatórios ja existentes
-- Visualizar relatórios
-- Exportar relatórios
+## mapa.py
+Implementa a lógica relacionada ao processamento e visualização do mapa (grafo de câmeras, rotas, posições e estrutura da rede).
 
-## Implementações feitas:
-- Função que gera dados para testes
-- Página HTML
-- Queries automatizadas (Tempo inicial, tempo final, intervalo de tempo, NCamera e hash) [Pesquisa por localizações são referenciadas pela posição da camera]
-- Prompt SQL para queries mais expecíficas
-- Listagem de arquivos em "Dados"
-- Referência de DB selecionada
-- Construção do mapa
-- Contagem de linhas do resultado da pesquisa
-- Query automatizadas (Linha e Estação referenciadas por informações da câmera cams.csv)
-- Adição de informações de cameras em /Dados/cams.csv
-- Topbar
-- Importe de arquivos para a lista de base de dados (File > Open)
-- Sidebar de navegação de abas
-- Destaque de camera pesquisada em AutoQuery
-- Exibir dados do vértice ao posicionar mouse sobre ele
-- Exportar log do terminal (File > Save)
-- Destacar fluxo pesquisado no mapa
-- Detectar discrepancias (Primeiro vertice deve ser de entrada, últimop vertice deve ser de saída e fluxo contínuo)
-- Procurar e destacar no mapa vertices e erastas hipotéticos e destacar no mapa
-- Salvar discrepâncias num relatório automaticamente
-- Gráficos
-- Atualizar .scv de banco de dados remoto
+## relatorio.py
+Script destinado à geração de relatórios e análises, utilizado para inspeção de dados, validação e apoio ao desenvolvimento.
+
+## cam_assets/
+Armazena os arquivos base utilizados na construção do grafo de câmeras e na renderização do mapa.
+### cams.csv
+Lista de câmeras com identificadores e características.
+### grafo.csv
+Estrutura do grafo representando conexões entre câmeras.
+### positions.csv
+Posições das câmeras para visualização no mapa.
+
+## Dados/
+Lista de bases de dados
+### mov_mongo_2025.csv
+Base de dados remota vinculada ao MongoDB automaticamente
+
+## Funcoes_auxiliares/
+Contém módulos auxiliares que implementam funcionalidades de suporte, como conexão com banco, leitura e escrita de dados, geração de dados e consultas.
+### Conexao.py
+Gerencia a conexão com o banco de dados (MongoDB). Definição dos dados de acesso do banco remoto
+### funcoesMongo.py
+Implementa funções utilitárias para operações no MongoDB.
+### geraDadosMongo.py
+Insere dados no MongoDB para testes.
+### InputMongo.py
+Funções de ingestão e leitura de dados.
+### OutputMongo.py
+Gerenciamento de dados de saída e exportações.
+
+## metodosValidacao/
+Armazena scripts e resultados relacionados à validação de desempenho do sistema.
+### analise_desempenho.py
+Análise de performance.
+### test_desempenho.py
+Testes automatizados de desempenho.
+### Resultados_testes_desempenho.csv
+Métricas obtidas durante os testes.
+
+## Relatorios/
+Arquivos de relatório gerados a partir do processamento de dados, incluindo registros de inconsistências e erros.
+
+## SOA/
+Diretório reservado a arquivos referentes ao módulo ou etapa SOA (Arquitetura Orientada a Serviços) do projeto. É utilizado pela aplicação para listagem dinâmica de arquivos CSV destinados a testes ou entrada de dados
+
+## static/
+Componentes estáticos utilizados pela interface web da aplicação.
+### styles.css
+Folha de estilos.
+### script.js
+Lógica de interação da interface.
+
+## templates/
+Templates HTML utilizados pelo backend da aplicação (ex.: Flask).
+### index.html
+Página principal renderizada pelo sistema.
+
 
 # Dependencias
-* 'python -m pip install duckdb flask pandas pyvis pymongo'
 - duckdb - Banco de dados em memória super rápido, usado para executar consultas SQL diretamente nos arquivos CSV
 - flask - Framework web em Python, responsável pela comunicação entre o backend em Python e o frontend HTML
 - pandas - Biblioteca para manipulação e análise de dados, usada pra transformar os resultados SQL em tabelas bem formatadas
@@ -99,6 +111,20 @@
 - pymongo - Integração com banco de dados remoto MongoDB
 
 # Executar:
-1. Inatale as dependêencias
-2. Rode app.py
+1. Inatale as dependêencias (python -m pip install duckdb flask pandas pyvis pymongo)
+2. Execute app.py
 3. Abra o link que o terminal fornecer (http://127.0.0.1:5000)
+
+# Possíveis implementações futuras:
+### Redução da velocidade de consulta: Implementar otimizações de indexação e cache
+para reduzir latência nas consultas, garantindo melhor desempenho em bases de grande escala.
+### Obtenção de dados de outras fontes
+Integrar novas origens de dados, como bilhetagem, catracas ou sensores complementares, ampliando a precisão e a contextualização das rotas analisadas.
+### Uso de dados de distância reais entre câmeras: Incorporar medições físicas reais entre câmeras para aprimorar a validação temporal dos deslocamentos e aumentar a
+fidelidade das estimativas de trajeto.
+### Manipulação de dados do mapa pela interface: Permitir a edição direta do grafo,
+incluindo criação e remoção de conexões ou câmeras, oferecendo maior autonomia ao usuário sem necessidade de alterar arquivos externos.
+### Criação de bancos de dados remotos pela interface
+Automatizar a configuração e criação de bancos remotos via interface, facilitando a implantação do sistema em ambientes distribuídos.
+### Requisição de imagens capturadas
+Habilitar a recuperação de imagens associadas às detecções, permitindo análises visuais e validação manual de trajetos dentro da própria plataforma

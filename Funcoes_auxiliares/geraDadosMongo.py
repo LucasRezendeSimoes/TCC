@@ -23,8 +23,8 @@ def gerar_movimentacao_realista(
 ):
     os.makedirs(os.path.dirname(caminho_csv), exist_ok=True)
 
-    grafo_df = pd.read_csv("Dados/grafo.csv")
-    cams_df = pd.read_csv("Dados/cams.csv")
+    grafo_df = pd.read_csv("cam_assets/grafo.csv")
+    cams_df = pd.read_csv("cam_assets/cams.csv")
     cams_df.columns = ["numero_camera", "estacao", "linha", "tipo", "imagem_default"]
 
     grafo = defaultdict(list)
@@ -41,7 +41,10 @@ def gerar_movimentacao_realista(
     }
 
     def gerar_hash():
-        return uuid.uuid4().hex[:8]
+        # return uuid.uuid4().hex[:8]
+        caracteres = "0123456789abcdef"
+        return ''.join(random.choice(caracteres) for _ in range(12))
+
 
     def gerar_posicao():
         return f"({random.randint(0, 500)},{random.randint(0, 500)})"

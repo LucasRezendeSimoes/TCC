@@ -1,0 +1,8 @@
+arquivo,tamanho_MB,linhas,tempo_carregamento_s,tempo_consulta_s
+movimentacao_pessoas_cameras.csv,0.0,19,0.17,0.027
+mov_2025.csv,0.08,1000,0.091,0.065
+mov_mongo_2025.csv,0.82,7668,0.036,0.039
+mov_Teste#1.csv,0.0,13,0.013,0.01
+terminal_output.csv,0.01,100,0.02,0.02
+Teste#1.csv,0.0,10,0.01,0.006
+teste.csv,0.0,19,0.012,0.012
